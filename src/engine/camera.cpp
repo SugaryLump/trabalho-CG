@@ -1,4 +1,5 @@
 #include "engine/camera.hpp"
+#include <iostream>
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -6,22 +7,30 @@
 #include <GL/glut.h>
 #endif
 
-namespace Camera {
+Camera::Camera() { posInitialCamera(); }
 
-static float radius = 5.0;
+float Camera::getXPosition() { return positionX; }
+float Camera::getYPosition() { return positionY; }
+float Camera::getZPosition() { return positionZ; }
+float Camera::getXLook() { return upX; }
+float Camera::getYLook() { return upY; }
+float Camera::getZLook() { return upZ; }
+float Camera::getXUp() { return positionX + lookX; }
+float Camera::getYUp() { return positionY + lookY; }
+float Camera::getZUp() { return positionZ + lookZ; }
 
-static float look_x = 0.0;
-static float look_y = 0.0;
-static float look_z = 0.0;
+void Camera::posInitialCamera() {
+  float radius = 10.0;
 
-static float x = look_x + radius;
-static float y = look_y + radius;
-static float z = look_z + radius;
+  lookX = 0.0;
+  lookY = 0.0;
+  lookZ = 0.0;
 
-void place_camera() {
-  // gluLookAt(x, y, z, x + look_x, y + look_y, z + look_z, 0.0f, 0.0f, 1.0f);
+  positionX = lookX + radius;
+  positionY = lookY + radius;
+  positionZ = lookZ + radius;
 
-  gluLookAt(5.0, 5.0, 5.0, 0.0, 0.0, 0.0, 0.0f, 0.0f, 1.0f);
+  upX = 0.0f;
+  upY = 0.0f;
+  upZ = 1.0f;
 }
-
-} // namespace Camera

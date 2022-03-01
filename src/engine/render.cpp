@@ -13,6 +13,8 @@
 
 namespace Render {
 
+static Camera *camera;
+
 static float SCALE = 1;
 static bool SHOW_AXIS = false;
 static int line = GL_FILL;
@@ -42,7 +44,10 @@ void renderScene(void) {
   // set camera
   glLoadIdentity();
 
-  Camera::place_camera();
+  gluLookAt(camera->getXPosition(), camera->getYPosition(),
+            camera->getZPosition(), camera->getXLook(), camera->getYLook(),
+            camera->getZLook(), camera->getXUp(), camera->getYUp(),
+            camera->getZUp());
 
   if (SHOW_AXIS) {
     // Axis
@@ -137,6 +142,8 @@ void renderKeybindings(unsigned char key, int _x, int _y) {
 }
 
 void render(int argc, char **argv) {
+  camera = new Camera();
+
   // put GLUT init here
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
@@ -149,7 +156,7 @@ void render(int argc, char **argv) {
   glEnable(GL_BLEND);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
-  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+  // glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
   // put callback registry here
   glutDisplayFunc(renderScene);
