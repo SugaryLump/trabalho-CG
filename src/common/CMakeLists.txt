@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 
-add_executable(generator
-  main.cpp
+add_library(common
+  shapes.cpp
 )
 
 target_link_libraries(
-    generator
     common
 )
