@@ -1,9 +1,12 @@
-#ifndef PLANE_H_
-#define PLANE_H_
+#pragma once
+
+#include <string>
+
 #include "figure.hpp"
 
 class Plane : public Figure {
 private:
+  static const std::string help_message;
   double length;
 
 public:
@@ -12,4 +15,3 @@ public:
   ~Plane(){};
 };
 
-#endif // PLANE_H_

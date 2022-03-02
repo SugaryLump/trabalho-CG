@@ -1,0 +1,18 @@
+﻿---
+BasedOnStyle: Google
+AlignTrailingComments: 'true'
+AllowShortBlocksOnASingleLine: 'true'
+AllowShortFunctionsOnASingleLine: Inline
+BinPackArguments: 'true'
+BinPackParameters: 'true'
+ColumnLimit: '120'
+CompactNamespaces: 'false'
+FixNamespaceComments: 'true'
+IndentWidth: '4'
+ReflowComments: 'true'
+SpaceAfterCStyleCast: 'true'
+SpaceAfterLogicalNot: 'false'
+SpaceBeforeAssignmentOperators: 'true'
+UseTab: Never
+
+...

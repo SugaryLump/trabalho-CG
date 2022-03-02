@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.5)
 
-add_executable(engine
-  main.cpp
-  render.cpp
-  camera.cpp
-)
+file(GLOB_RECURSE sources CONFIGURE_DEPENDS "*.cpp")
+
+add_executable(engine ${sources})
+
+# Calar o CMake sobre o OpenGL legacy
+set(OpenGL_GL_PREFERENCE "GLVND")
 
 find_package(OpenGL REQUIRED)
 include_directories(${OpenGL_INCLUDE_DIRS})
