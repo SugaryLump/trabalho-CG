@@ -14,7 +14,7 @@ void writeModel(const char* filename, Model model) {
         stream << "v " << vertex.x << " " << vertex.y << " " << vertex.z << "\n";
     }
 
-    stream << "# Faces\n";
+    stream << "\n# Faces\n";
     for(long unsigned int f = 0; f < model.faces.size(); f++) {
         tuple<int,int,int> face = model.faces[f];
         stream << "f " << get<0>(face) << " " << get<1>(face) << " " << get<2>(face) << "\n";
