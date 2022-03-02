@@ -1,5 +1,7 @@
 #include "generator/figure.hpp"
 #include "generator/plane.hpp"
+#include "generator/io.hpp"
+#include "common/shapes.hpp"
 #include <iostream>
 #include <map>
 
@@ -34,7 +36,7 @@ void initializeOptionsValues(int argc, char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-  initializeOptionsValues(argc - 3, argv + 3);
+  /*initializeOptionsValues(argc - 3, argv + 3);
   PROGRAM_NAME = argv[0];
 
   if (argc < 3 || string(argv[1]) == "-h" || string(argv[1]) == "-help") {
@@ -49,7 +51,9 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  cerr << mapOptionsValues[option].second << "\n";
+  cerr << mapOptionsValues[option].second << "\n";*/
+  Model plane = newPlane(3, 3);
+  writeModel("plane.3d", plane);
 
   return 0;
 }
