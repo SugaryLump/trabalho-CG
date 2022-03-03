@@ -55,3 +55,5 @@ Model newPlane(float length, int subdivisions);
 Model newBox(float length, int subdivisions);
 int calcBoxInnerVertexes(int x, int y, int z, int subdivisions);
 int calcBoxVertexIndex(int x, int y, int z, int subdivisions);
+Model newSphere(float radius, int slices, int stacks);
+Model newCone(float radius, float height, float slices, float stacks);
