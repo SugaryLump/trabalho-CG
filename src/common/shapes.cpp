@@ -194,6 +194,9 @@ Model newSphere(float radius, int slices, int stacks) {
     if (st == 0) {
       sphere.addVertex(sphericalToCartesian(0, beta, radius));
     }
+    else if (st == stacks) {
+      sphere.addVertex(sphericalToCartesian(0, M_PI / 2, radius));
+    }
     else {
       float alpha = 0;
       for (int sl = 0; sl < slices; sl++) {
@@ -208,22 +211,22 @@ Model newSphere(float radius, int slices, int stacks) {
   //Faces
   for (int st = 0; st < stacks; st++) {
     for (int sl = 0; sl < slices; sl++) {
-      //Bottom stack
+      //Top stack
       if (st == stacks - 1) {
         if (sl < slices - 1) {
-          sphere.addFace(st * slices + 1, (st - 1) * slices + sl + 2, (st - 1) * slices + sl + 1);
+          sphere.addFace(st * slices + 1, (st - 2) * slices + sl + 1, (st - 2) * slices + sl + 2);
         }
         else {
-          sphere.addFace(st * slices + 1, (st - 1) * slices + 1, (st - 1) * slices + sl + 1);
+          sphere.addFace(st * slices + 1, (st - 1) * slices, (st - 2) * slices + 1);
         }
       }
-      //Top stack
+      //Bottom stack
       else if (st == 0) {
         if (sl < slices - 1) {
-          sphere.addFace(0, sl + 1, sl + 2);
+          sphere.addFace(0, sl + 2, sl + 1);
         }
         else {
-          sphere.addFace(0, slices, 1);
+          sphere.addFace(0, 1, slices);
         }
       }
       //Middle stacks
@@ -233,16 +236,16 @@ Model newSphere(float radius, int slices, int stacks) {
           int v2 = st * slices + 1 + sl;
           int v3 = st * slices + 2 + sl;
           int v4 = (st - 1) * slices + 2 + sl;
-          sphere.addFace(v1, v2, v3);
-          sphere.addFace(v1, v3, v4);
+          sphere.addFace(v1, v3, v2);
+          sphere.addFace(v1, v4, v3);
         }
         else {
           int v1 = (st - 1) * slices + 1 + sl;
           int v2 = st * slices + 1 + sl;
           int v3 = st * slices + 1;
           int v4 = (st - 1) * slices + 1;
-          sphere.addFace(v1, v2, v3);
-          sphere.addFace(v1, v3, v4);
+          sphere.addFace(v1, v3, v2);
+          sphere.addFace(v1, v4, v3);
         }
       }
     }
@@ -258,11 +261,12 @@ Model newCone(float radius, float height, float slices, float stacks) {
 
   //Vertexes
   cone.addVertex(Vector3(0, 0, 0));
-  cone.addVertex(Vector3(0, 0, height));
+  cone.addVertex(Vector3(0, height, 0));
   for (int st = 0; st < stacks; st++) {
     float alpha = 0;
     for (int sl = 0; sl < slices; sl++) {
       cone.addVertex(polarToCartesian(alpha, radius - (radius / stacks * st), (height / stacks) * st));
+      alpha += 2 * M_PI / slices;
     }
   }
 
@@ -292,18 +296,18 @@ Model newCone(float radius, float height, float slices, float stacks) {
         if (sl < slices - 1) {
           int v1 = (st - 1) * slices + sl + 2;
           int v2 = (st - 1) * slices + sl + 3;
-          int v3 = st * slices + sl;
+          int v3 = st * slices + sl + 2;
           int v4 = st * slices + sl + 3;
-          cone.addFace(v1, v2, v3);
-          cone.addFace(v1, v2, v4);
+          cone.addFace(v2, v3, v1);
+          cone.addFace(v2, v4, v1);
         }
         else {
           int v1 = (st - 1) * slices + sl + 2;
           int v2 = (st - 1) * slices + 2;
-          int v3 = st * slices + sl;
+          int v3 = st * slices + sl + 2;
           int v4 = st * slices + 2;
-          cone.addFace(v1, v2, v3);
-          cone.addFace(v1, v2, v4);
+          cone.addFace(v2, v3, v1);
+          cone.addFace(v2, v4, v1);
         }
       }
     }
