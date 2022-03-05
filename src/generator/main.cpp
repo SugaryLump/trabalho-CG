@@ -52,11 +52,11 @@ int main(int argc, char *argv[]) {
   }
 
   cerr << mapOptionsValues[option].second << "\n";
-  /*
   //Box Generation
   Model box = newBox(2, 2);
   writeModel("box.3d", box);
 
+  /*
   //Plane Generation
   Model plane = newBox(3, 3);
   writeModel("plane.3d", plane);

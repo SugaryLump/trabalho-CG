@@ -35,3 +35,6 @@ src/*/build
 build/*
 .cache
 .vscode/*
+.idea/
+cmake-build-*/
+cmake.py
