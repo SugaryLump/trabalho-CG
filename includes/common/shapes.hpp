@@ -38,8 +38,8 @@ struct Triangle {
 
 class Model {
    public:
-    std::vector<Vector3> vertexes;
-    std::vector<std::tuple<int, int, int>> faces;
+    std::vector<float> vertexes;
+    std::vector<unsigned int> faces;
 
     /**
      * @brief Cria um modelo vazio
@@ -52,8 +52,7 @@ class Model {
     explicit Model(std::string const &path);
 
     void addVertex(Vector3 vertex);
-
-    void addFace(int v1, int v2, int v3);
+    void addFace(unsigned int v1, unsigned int v2, unsigned int v3);
 };
 
 Model newPlane(float length, int subdivisions);

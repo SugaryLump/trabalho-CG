@@ -1,7 +1,8 @@
 #include "common/shapes.hpp"
 
+#include <iostream>
+#include <fstream>
 #include <tgmath.h>
-
 #include <tuple>
 #include <vector>
 
@@ -21,13 +22,17 @@ Vector3 polarToCartesian(float alpha, float radius, float y) {
 }
 
 void Model::addVertex(Vector3 vertex) {
-    vertexes.push_back(vertex);
+    vertexes.push_back(vertex.x);
+    vertexes.push_back(vertex.y);
+    vertexes.push_back(vertex.z);
 }
 
-void Model::addFace(int v1, int v2, int v3) {
-    tuple<int, int, int> face = {v1, v2, v3};
-    faces.push_back(face);
+void Model::addFace(unsigned int v1, unsigned int v2, unsigned int v3) {
+    faces.push_back(v1);
+    faces.push_back(v2);
+    faces.push_back(v3);
 }
+
 Model::Model(const string& path) {
     string line;
     ifstream file(path);
