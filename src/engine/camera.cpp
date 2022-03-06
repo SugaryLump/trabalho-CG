@@ -22,13 +22,13 @@ void Camera::posInitialCamera() {
     alpha = 0;
     beta = M_PI / 100;
 
-    lookX = 0.0;
-    lookY = 0.0;
-    lookZ = 0.0;
+    look.x = 0.0;
+    look.y = 0.0;
+    look.z = 0.0;
 
-    upX = 0.0f;
-    upY = 1.0f;
-    upZ = 0.0f;
+    up.x = 0.0f;
+    up.y = 1.0f;
+    up.z = 0.0f;
 
     updateFollow();
 }
@@ -38,18 +38,19 @@ void Camera::changeTypeCamera(CameraType newType) {
 }
 
 void Camera::setFollowPoint(Vector3 point) {
-    lookX = point.x;
-    lookY = point.y;
-    lookZ = point.z;
+    look.x = point.x;
+    look.y = point.y;
+    look.z = point.z;
 }
 
 void Camera::setNextTypeCamera() {
     switch (currentType) {
         case FOLLOW:
-            currentType = FREE;
+            currentType = FPS;
             break;
-        case FREE:
+        case FPS:
             currentType = FOLLOW;
+            posInitialCamera();
             break;
         default:
             currentType = FOLLOW;
@@ -60,9 +61,9 @@ void Camera::setNextTypeCamera() {
 /*** FOLLOW *****/
 
 void Camera::updateFollow() {
-    positionX = lookX + radius * cos(beta) * sin(alpha);
-    positionZ = lookZ + radius * cos(beta) * cos(alpha);
-    positionY = lookY + radius * sin(beta);
+    position.x = look.x + radius * cos(beta) * sin(alpha);
+    position.z = look.z + radius * cos(beta) * cos(alpha);
+    position.y = look.y + radius * sin(beta);
 }
 
 void Camera::followMoveUp() {
@@ -112,4 +113,49 @@ void Camera::followProcessSpecialKeys(int key, int _x, int _y) {
     }
 
     updateFollow();
+}
+
+void Camera::normalizeAlphaBeta() {
+    if (alpha > 2 * M_PI) {
+        alpha -= 2 * M_PI;
+    } else if (alpha < 0) {
+        alpha += 2 * M_PI;
+    }
+
+    if (beta > M_PI_2) {
+        beta = M_PI_2 - 0.01;
+    } else if (beta < -M_PI_2) {
+        beta = -M_PI_2 + 0.01;
+    }
+}
+
+// FPS
+void Camera::fpsProcessSpecialKeys(int key, int _x, int _y) {
+    short hMoveInput = keysState['d'] - keysState['a'];
+    short vMoveInput = keysState['w'] - keysState['s'];
+    short extraMoveInput = keysState[' '] - keysState['c'];
+
+    // Mouse Handler
+    alpha -= mouseDeltaX * 0.005;
+    beta += mouseDeltaY * 0.005;
+    normalizeAlphaBeta();
+    Vector3 tmp = sphericalToCartesian(alpha + M_PI, -beta, 5);
+    look.x = tmp.x + position.x;
+    look.y = tmp.y + position.y;
+    look.z = tmp.z + position.z;
+
+    // Keyboard Handler
+    Vector3 fVector = sphericalToCartesian(alpha + M_PI, -beta, 0.075);
+    Vector3 sVector = sphericalToCartesian(alpha + M_PI_2, 0, 0.075);
+    float vertical = 0.05 * extraMoveInput;
+    position.x += fVector.x * vMoveInput + sVector.x * hMoveInput;
+    position.y += fVector.y * vMoveInput + sVector.y * hMoveInput + vertical;
+    position.z += fVector.z * vMoveInput + sVector.z * hMoveInput;
+    look.x += fVector.x * vMoveInput + sVector.x * hMoveInput;
+    look.y += fVector.y * vMoveInput + sVector.y * hMoveInput;
+    look.z += fVector.z * vMoveInput + sVector.z * hMoveInput;
+
+    for (int i = 0; i < 256; i++) { previousKeysState[i] = keysState[i]; }
+    mouseDeltaX = 0;
+    mouseDeltaY = 0;
 }

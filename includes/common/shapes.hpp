@@ -1,8 +1,8 @@
 #pragma once
 
+#include <string>
 #include <tuple>
 #include <vector>
-#include <string>
 
 struct Vector3 {
     float x;
@@ -23,6 +23,9 @@ struct Vector3 {
         z = newz;
     }
 };
+
+Vector3 sphericalToCartesian(float alpha, float beta, float radius);
+Vector3 polarToCartesian(float alpha, float radius, float y);
 
 struct Triangle {
     Vector3 p1;

@@ -44,8 +44,8 @@ void renderScene(void) {
     // set camera
     glLoadIdentity();
 
-    gluLookAt(camera->positionX, camera->positionY, camera->positionZ, camera->lookX, camera->lookY, camera->lookZ,
-              camera->upX, camera->upY, camera->upZ);
+    gluLookAt(camera->position.x, camera->position.y, camera->position.z, camera->look.x, camera->look.y,
+              camera->look.z, camera->up.x, camera->up.y, camera->up.z);
 
     if (SHOW_AXIS) {
         // Axis
@@ -144,14 +144,41 @@ void renderKeybindings(unsigned char key, int _x, int _y) {
 }
 
 void processSpecialKeys(int key, int _x, int _y) {
+    if (key < 112) { camera->specialKeysState[key] = 1; }
     switch (key) {
         default:
             switch (camera->currentType) {
                 case FOLLOW:
                     camera->followProcessSpecialKeys(key, _x, _y);
                     break;
+                case FPS:
+                    camera->fpsProcessSpecialKeys(key, _x, _y);
+                    break;
             }
             break;
+    }
+}
+
+void keyboardReleaseHandler(unsigned char key, int x, int y) {
+    camera->keysState[key] = 0;
+}
+
+void specialKeyboardPressHandler(int key, int x, int y) {
+    if (key < 112) { camera->specialKeysState[key] = 1; }
+}
+
+void specialKeyboardReleaseHandler(int key, int x, int y) {
+    if (key < 112) { camera->specialKeysState[key] = 0; }
+}
+
+void passiveMouseHandler(int x, int y) {
+    if (!camera->pointerWarp) {
+        camera->mouseDeltaX = x - 540;
+        camera->mouseDeltaY = y - 500;
+        camera->pointerWarp = true;
+        glutWarpPointer(540, 500);
+    } else {
+        camera->pointerWarp = false;
     }
 }
 
@@ -176,8 +203,14 @@ void render(int argc, char **argv) {
     glutDisplayFunc(renderScene);
     glutReshapeFunc(changeSize);
     glutIdleFunc(renderScene);
+
+    // Callback registration for keyboard processing
     glutKeyboardFunc(renderKeybindings);
     glutSpecialFunc(processSpecialKeys);
+
+    glutKeyboardUpFunc(keyboardReleaseHandler);
+    glutSpecialUpFunc(specialKeyboardReleaseHandler);
+    glutPassiveMotionFunc(passiveMouseHandler);
 
     // enter GLUTs main cycle
     glutMainLoop();

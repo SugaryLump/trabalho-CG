@@ -4,28 +4,33 @@
 #include "common/shapes.hpp"
 
 enum CameraType {
-    FREE,
+    FPS,
     FOLLOW,
 };
 
 struct Camera {
+   private:
+    void normalizeAlphaBeta();
+
    public:
     CameraType currentType;
-    float positionX, positionY, positionZ;
-    float upX, upY, upZ;
-    float lookX, lookY, lookZ;
+
+    Vector3 position;
+    Vector3 up;
+    Vector3 look;
     float alpha, beta;
     float radius;
+
+    short previousKeysState[256];
+    short keysState[256];
+    short specialKeysState[112];
+    int prevMouseX;
+    int prevMouseY;
+    int mouseDeltaX;
+    int mouseDeltaY;
+    bool pointerWarp;
+
     Camera();
-    // float getXPosition();
-    // float getYPosition();
-    // float getZPosition();
-    // float getXLook();
-    // float getYLook();
-    // float getZLook();
-    // float getXUp();
-    // float getYUp();
-    // float getZUp();
     void posInitialCamera();
     void changeTypeCamera(CameraType newType);
     void setFollowPoint(Vector3 point);
@@ -41,6 +46,9 @@ struct Camera {
     void followMoveIn();
     void followMoveOut();
     void followProcessSpecialKeys(int key, int _x, int _y);
+
+    // FPS
+    void fpsProcessSpecialKeys(int key, int _x, int _y);
 };
 
 #endif  // CAMERA_HPP_
