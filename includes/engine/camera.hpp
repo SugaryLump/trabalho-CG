@@ -15,6 +15,8 @@ struct Camera {
    public:
     CameraType currentType;
 
+    const float near, far;
+
     Vector3 position;
     Vector3 up;
     Vector3 look;
@@ -30,7 +32,8 @@ struct Camera {
     int mouseDeltaY;
     bool pointerWarp;
 
-    Camera();
+    Camera() : near(1), far(1000) { posInitialCamera(); }
+    Camera(float near, float far) : near(near), far(far) { posInitialCamera(); }
     void posInitialCamera();
     void changeTypeCamera(CameraType newType);
     void setFollowPoint(Vector3 point);

@@ -11,10 +11,6 @@
 #include <GL/glut.h>
 #endif
 
-Camera::Camera() {
-    posInitialCamera();
-}
-
 void Camera::posInitialCamera() {
     currentType = FOLLOW;
 
@@ -83,11 +79,11 @@ void Camera::followMoveRight() {
 }
 
 void Camera::followMoveIn() {
-    radius -= 0.5;
+    if ((radius - 0.5) >= near) radius -= 0.5;
 }
 
 void Camera::followMoveOut() {
-    radius += 0.5;
+    if ((radius + 0.5) <= far) radius += 0.5;
 }
 
 void Camera::followProcessSpecialKeys(int key, int _x, int _y) {
