@@ -1,8 +1,9 @@
 #include "common/shapes.hpp"
 
-#include <iostream>
-#include <fstream>
 #include <tgmath.h>
+
+#include <fstream>
+#include <iostream>
 #include <tuple>
 #include <vector>
 
