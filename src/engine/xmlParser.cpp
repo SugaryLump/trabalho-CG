@@ -13,22 +13,26 @@ namespace Parser{
         float x = stof(pos.attribute("x").value());
         float y = stof(pos.attribute("y").value());
         float z = stof(pos.attribute("z").value());
+        // fazer cenas
 
-        pugi::xml_node pos = node.child("lookAt");
+        pos = node.child("lookAt");
         x = stof(pos.attribute("x").value());
         y = stof(pos.attribute("y").value());
         z = stof(pos.attribute("z").value());
+        // fazer cenas
 
-        pugi::xml_node pos = node.child("up");
+        pos = node.child("up");
         x = stof(pos.attribute("x").value());
         y = stof(pos.attribute("y").value());
         z = stof(pos.attribute("z").value());
+        // fazer cenas
 
 
-        pugi::xml_node pos = node.child("projection");
+        pos = node.child("projection");
         float near = stof(pos.attribute("near").value());
         float far = stof(pos.attribute("far").value());
         float fov = stof(pos.attribute("fov").value());
+        // fazer cenas
 
         Camera* c = new Camera(near, far, fov);
         // todo set position, lookant and up
@@ -45,7 +49,7 @@ namespace Parser{
        }
         //std::cout << doc.child("world").child("group") << std::endl;
 
-        Camera c; 
+        Camera c;
         for (pugi::xml_node node: doc.child("world") ) {
             string name = node.name();
             if(!name.compare("camera")) {
