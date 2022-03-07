@@ -1,15 +1,15 @@
 #include <iostream>
 
 #include "engine/render.hpp"
-#include "engine/xmlParser.hpp"
+//#include "engine/xmlParser.hpp"
 
 using namespace std;
 
 int main(int argc, char *argv[]) {
   // chamar o parser
-  Parser::parser();
+  //Parser::parser();
 
-  //Render::render(argc, argv);
+  Render::render(argc, argv);
 
   return 0;
 }

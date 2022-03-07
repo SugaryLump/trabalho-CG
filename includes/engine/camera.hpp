@@ -2,6 +2,7 @@
 #define CAMERA_HPP_
 
 #include "common/shapes.hpp"
+#include "engine/input.hpp"
 
 enum CameraType {
     FPS,
@@ -23,15 +24,6 @@ struct Camera {
     float alpha, beta;
     float radius;
 
-    short previousKeysState[256];
-    short keysState[256];
-    short specialKeysState[112];
-    int prevMouseX;
-    int prevMouseY;
-    int mouseDeltaX;
-    int mouseDeltaY;
-    bool pointerWarp;
-
     Camera() : near(1), far(1000), fov(90) { 
       posInitialCamera(); 
       }
@@ -39,11 +31,11 @@ struct Camera {
     void posInitialCamera();
     void changeTypeCamera(CameraType newType);
     void setFollowPoint(Vector3 point);
-
     void setNextTypeCamera();
+    void update(InputState* input);
 
     // FOLLOW
-    void updateFollow();
+    void updateFollow(InputState* input);
     void followMoveUp();
     void followMoveDown();
     void followMoveLefth();
@@ -53,7 +45,7 @@ struct Camera {
     void followProcessSpecialKeys(int key, int _x, int _y);
 
     // FPS
-    void fpsProcessSpecialKeys(int key, int _x, int _y);
+    void updateFPS(InputState* input);
 };
 
 #endif  // CAMERA_HPP_
