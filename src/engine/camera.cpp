@@ -11,6 +11,7 @@
 #include <GL/glut.h>
 #endif
 
+
 void Camera::posInitialCamera() {
     currentType = FOLLOW;
 
