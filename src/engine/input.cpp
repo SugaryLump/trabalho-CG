@@ -7,7 +7,7 @@ InputState::InputState() {
     keysState = new bool[KEYS_COUNT];
     prevKeysState = new bool[KEYS_COUNT];
     specialKeysState = new bool[SPECIAL_KEYS_COUNT];
-    specialKeysState = new bool[SPECIAL_KEYS_COUNT];
+    prevSpecialKeysState = new bool[SPECIAL_KEYS_COUNT];
     mouseDeltaX = 0;
     mouseDeltaY = 0;
 }
@@ -62,7 +62,7 @@ void InputState::releaseKey(int key) {
 }
 
 void InputState::releaseSpecialKey(int specialKey) {
-    keysState[specialKey] = false;
+    specialKeysState[specialKey] = false;
 }
 
 void InputState::updateMouseDelta(int mouseX, int mouseY,

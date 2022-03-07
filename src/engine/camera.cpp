@@ -62,7 +62,7 @@ void Camera::setNextTypeCamera() {
             break;
         case FPS:
             currentType = FOLLOW;
-            posInitialCamera();
+            //posInitialCamera();
             break;
         default:
             currentType = FOLLOW;
@@ -90,8 +90,8 @@ void Camera::update(InputState* input) {
 /*** FOLLOW *****/
 
 void Camera::updateFollow(InputState* input) {
-    alpha += 0.05 * (input->specialKeyAxisDirection(GLUT_KEY_LEFT, GLUT_KEY_RIGHT));
-    beta += 0.05 * (input->specialKeyAxisDirection(GLUT_KEY_DOWN, GLUT_KEY_UP));
+    alpha += 0.03 * (input->specialKeyAxisDirection(GLUT_KEY_LEFT, GLUT_KEY_RIGHT));
+    beta += 0.03 * (input->specialKeyAxisDirection(GLUT_KEY_DOWN, GLUT_KEY_UP));
     normalizeAlphaBeta();
     radius += 0.05 * (input->specialKeyAxisDirection(GLUT_KEY_F1, GLUT_KEY_F2));
 
@@ -106,7 +106,7 @@ void Camera::updateFPS(InputState* input) {
     alpha -= input->getMouseDeltaX() * 0.005;
     beta += input->getMouseDeltaY() * 0.005;
     normalizeAlphaBeta();
-    Vector3 tmp = sphericalToCartesian(alpha + M_PI, -beta, 5);
+    Vector3 tmp = sphericalToCartesian(alpha + M_PI, -beta, radius);
     look.x = tmp.x + position.x;
     look.y = tmp.y + position.y;
     look.z = tmp.z + position.z;
