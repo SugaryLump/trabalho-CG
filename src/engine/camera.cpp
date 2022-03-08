@@ -1,6 +1,8 @@
 #include "engine/camera.hpp"
-#include "engine/input.hpp"
+
 #include <iostream>
+
+#include "engine/input.hpp"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -62,7 +64,7 @@ void Camera::setNextTypeCamera() {
             break;
         case FPS:
             currentType = FOLLOW;
-            //posInitialCamera();
+            // posInitialCamera();
             break;
         default:
             currentType = FOLLOW;
@@ -70,13 +72,10 @@ void Camera::setNextTypeCamera() {
     }
 }
 
-
 void Camera::update(InputState* input) {
-    if (input->keyTapped('f')) {
-        setNextTypeCamera();
-    }
+    if (input->keyTapped('f')) { setNextTypeCamera(); }
 
-    switch(currentType) {
+    switch (currentType) {
         case FOLLOW:
             updateFollow(input);
             break;
@@ -114,7 +113,7 @@ void Camera::updateFPS(InputState* input) {
     // Keyboard Handler
     int vMoveInput = input->keyAxisDirection('s', 'w');
     int hMoveInput = input->keyAxisDirection('a', 'd');
-    
+
     Vector3 fVector = sphericalToCartesian(alpha + M_PI, -beta, 0.075);
     Vector3 sVector = sphericalToCartesian(alpha + M_PI_2, 0, 0.075);
     float vertical = 0.05 * input->keyAxisDirection('c', ' ');

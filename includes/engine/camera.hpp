@@ -24,9 +24,7 @@ struct Camera {
     float alpha, beta;
     float radius;
 
-    Camera() : near(1), far(1000), fov(90) { 
-      posInitialCamera(); 
-      }
+    Camera() : near(1), far(1000), fov(90) { posInitialCamera(); }
     Camera(float near, float far, float fov) : near(near), far(far), fov(fov) { posInitialCamera(); }
     void posInitialCamera();
     void changeTypeCamera(CameraType newType);

@@ -5,4 +5,4 @@ namespace Render {
 void render(int argc, char **argv);
 }
 
-#endif // RENDER_HPP_
+#endif  // RENDER_HPP_

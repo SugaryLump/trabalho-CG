@@ -48,7 +48,7 @@ int InputState::getMouseDeltaY() {
     return mouseDeltaY;
 }
 
-//State updating
+// State updating
 void InputState::pressKey(int key) {
     keysState[key] = true;
 }
@@ -65,20 +65,15 @@ void InputState::releaseSpecialKey(int specialKey) {
     specialKeysState[specialKey] = false;
 }
 
-void InputState::updateMouseDelta(int mouseX, int mouseY,
-                                  int centerX, int centerY) {
+void InputState::updateMouseDelta(int mouseX, int mouseY, int centerX, int centerY) {
     mouseDeltaX = mouseX - centerX;
     mouseDeltaY = mouseY - centerY;
 }
 
 void InputState::updatePreviousState() {
-    for (int k = 0; k < KEYS_COUNT; k++) {
-        prevKeysState[k] = keysState[k];
-    }
+    for (int k = 0; k < KEYS_COUNT; k++) { prevKeysState[k] = keysState[k]; }
 
-    for (int k = 0; k < SPECIAL_KEYS_COUNT; k++) {
-        prevSpecialKeysState[k] = specialKeysState[k];
-    }
+    for (int k = 0; k < SPECIAL_KEYS_COUNT; k++) { prevSpecialKeysState[k] = specialKeysState[k]; }
 }
 
 void InputState::resetMouseDelta() {
