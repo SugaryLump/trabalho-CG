@@ -12,11 +12,10 @@ enum CameraType {
 struct Camera {
    private:
     void normalizeAlphaBeta();
+    float near, far, fov;
 
    public:
     CameraType currentType;
-
-    const float near, far, fov;
 
     Vector3 position;
     Vector3 up;
@@ -24,10 +23,13 @@ struct Camera {
     float alpha, beta;
     float radius;
 
-    Camera() : near(1), far(1000), fov(90) { 
-      posInitialCamera(); 
-      }
-    Camera(float near, float far, float fov) : near(near), far(far), fov(fov) { posInitialCamera(); }
+    Camera() { posInitialCamera(); }
+    Camera(float near, float far, float fov);
+    Camera(Vector3 newLook, Vector3 newUp, Vector3 newPosition, float near, float far, float fov);
+    float getNear();
+    float getFar();
+    float getFov();
+    void setup(Vector3 newLook, Vector3 newUp, Vector3 newPosition);
     void posInitialCamera();
     void changeTypeCamera(CameraType newType);
     void setFollowPoint(Vector3 point);

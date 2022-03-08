@@ -1,6 +1,8 @@
 #include "engine/camera.hpp"
-#include "engine/input.hpp"
+
 #include <iostream>
+
+#include "engine/input.hpp"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -25,6 +27,31 @@ void Camera::normalizeAlphaBeta() {
     }
 }
 
+Camera::Camera(float near, float far, float fov) {
+    posInitialCamera();
+    near = near;
+    far = far;
+    fov = fov;
+}
+
+Camera::Camera(Vector3 newLook, Vector3 newUp, Vector3 newPosition, float near, float far, float fov) {
+    look.x = newLook.x;
+    look.y = newLook.y;
+    look.z = newLook.z;
+
+    up.x = newUp.x;
+    up.y = newUp.y;
+    up.z = newUp.z;
+
+    position.x = newPosition.x;
+    position.y = newPosition.y;
+    position.z = newPosition.z;
+
+    near = near;
+    far = far;
+    fov = fov;
+}
+
 void Camera::posInitialCamera() {
     currentType = FOLLOW;
 
@@ -43,6 +70,22 @@ void Camera::posInitialCamera() {
     position.x = 0;
     position.z = 10;
     position.y = 0;
+
+    near = 1;
+    far = 1000;
+    fov = 90;
+}
+
+float Camera::getNear() {
+    return near;
+}
+
+float Camera::getFar() {
+    return far;
+}
+
+float Camera::getFov() {
+    return fov;
 }
 
 void Camera::changeTypeCamera(CameraType newType) {
@@ -55,6 +98,20 @@ void Camera::setFollowPoint(Vector3 point) {
     look.z = point.z;
 }
 
+void Camera::setup(Vector3 newLook, Vector3 newUp, Vector3 newPosition) {
+    look.x = newLook.x;
+    look.y = newLook.y;
+    look.z = newLook.z;
+
+    up.x = newUp.x;
+    up.y = newUp.y;
+    up.z = newUp.z;
+
+    position.x = newPosition.x;
+    position.y = newPosition.y;
+    position.z = newPosition.z;
+}
+
 void Camera::setNextTypeCamera() {
     switch (currentType) {
         case FOLLOW:
@@ -62,7 +119,7 @@ void Camera::setNextTypeCamera() {
             break;
         case FPS:
             currentType = FOLLOW;
-            //posInitialCamera();
+            // posInitialCamera();
             break;
         default:
             currentType = FOLLOW;
@@ -70,13 +127,10 @@ void Camera::setNextTypeCamera() {
     }
 }
 
-
 void Camera::update(InputState* input) {
-    if (input->keyTapped('f')) {
-        setNextTypeCamera();
-    }
+    if (input->keyTapped('f')) { setNextTypeCamera(); }
 
-    switch(currentType) {
+    switch (currentType) {
         case FOLLOW:
             updateFollow(input);
             break;
@@ -114,7 +168,7 @@ void Camera::updateFPS(InputState* input) {
     // Keyboard Handler
     int vMoveInput = input->keyAxisDirection('s', 'w');
     int hMoveInput = input->keyAxisDirection('a', 'd');
-    
+
     Vector3 fVector = sphericalToCartesian(alpha + M_PI, -beta, 0.075);
     Vector3 sVector = sphericalToCartesian(alpha + M_PI_2, 0, 0.075);
     float vertical = 0.05 * input->keyAxisDirection('c', ' ');
