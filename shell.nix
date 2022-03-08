@@ -1,5 +1,5 @@
 with (import <nixpkgs> {});
 mkShell {
   name = "cg";
-  buildInputs = [ cmake gnumake libGL libGLU freeglut ];
+  buildInputs = [ clang-tools cmake gnumake libGL libGLU freeglut ];
 }

@@ -6,10 +6,10 @@
 using namespace std;
 
 int main(int argc, char *argv[]) {
-  // chamar o parser
-  //Parser::parser();
+    // chamar o parser
+    // Parser::parser();
 
-  Render::render(argc, argv);
+    Render::render(argc, argv);
 
-  return 0;
+    return 0;
 }

@@ -7,16 +7,17 @@
 #endif
 
 #include <vector>
+
 #include "common/shapes.hpp"
 
 class VBOController {
-    private:
-        GLuint* buffers;
-        GLuint* vertices;
+   private:
+    GLuint* buffers;
+    GLuint* vertices;
 
-    public:
-        VBOController() = default;
-        explicit VBOController(std::vector<Model> models);
-        
-        void drawModels();
+   public:
+    VBOController() = default;
+    explicit VBOController(std::vector<Model> models);
+
+    void drawModels();
 };
