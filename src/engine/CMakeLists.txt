@@ -8,13 +8,25 @@ add_executable(engine ${sources})
 set(OpenGL_GL_PREFERENCE "GLVND")
 
 find_package(OpenGL REQUIRED)
-include_directories(${OpenGL_INCLUDE_DIRS})
-link_directories(${OpenGL_LIBRARY_DIRS})
+target_include_directories(engine PRIVATE ${OPENGL_INCLUDE_DIR})
+target_link_libraries(engine ${OPENGL_LIBRARIES})
 add_definitions(${OpenGL_DEFINITIONS})
+
+target_link_libraries(engine fmt)
+target_link_libraries(engine pugixml)
 
 if(NOT OPENGL_FOUND)
     message(ERROR " OPENGL not found!")
 endif(NOT OPENGL_FOUND)
+
+if(NOT OPENGL_GLU_FOUND)
+	message(ERROR " OPENGL not found!")
+endif(NOT OPENGL_GLU_FOUND)
+
+# Em NixOS, o GLU está noutro sítio, por isso verificar isso
+if (DEFINED ENV{GLU_DIRECTORY})
+	target_include_directories(engine PRIVATE $ENV{GLU_DIRECTORY})
+endif(DEFINED ENV{GLU_DIRECTORY})
 
 if  (WIN32)
 

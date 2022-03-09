@@ -1,3 +1,5 @@
+#include <fmt/core.h>
+
 #include <iostream>
 #include <map>
 
@@ -15,15 +17,18 @@ static char *PROGRAM_NAME;
 static std::map<std::string, pair<int, string>> mapOptionsValues;
 
 void printHelpPage() {
-    cerr << "HELP PAGE: " << endl
-         << "Usage: " << PROGRAM_NAME << " filename Option [Args ...]" << endl
-         << "Options: " << endl;
-    map<string, pair<int, string>>::iterator value;
-    for (value = mapOptionsValues.begin(); value != mapOptionsValues.end(); value++) {
-        cerr << "\t" << value->first << endl;
+    fmt::print(stderr,
+               "HELP PAGE:\n"
+               "Usage: {} filename option [args...]\n"
+               "Options:\n",
+               PROGRAM_NAME);
+
+    for (auto & mapOptionsValue : mapOptionsValues) {
+        fmt::print(stderr, "\t{}\n", mapOptionsValue.first);
     }
-    cerr << "\t-help" << endl;
-    cerr << "\t-h" << endl;
+
+    fmt::print(stderr,
+               "\t-help\n\t-h");
 }
 
 void initializeOptionsValues(int argc, char *argv[]) {
@@ -32,7 +37,6 @@ void initializeOptionsValues(int argc, char *argv[]) {
     mapOptionsValues["box"] = {++i, "BOX!!"};
     mapOptionsValues["sphere"] = {++i, "SPHERE!!"};
     mapOptionsValues["cone"] = {++i, "CONE!!!"};
-    // mapOptionsValues["plane"] = {NULL, "PLANE!!"};
 }
 
 int main(int argc, char *argv[]) {
@@ -51,7 +55,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    cerr << mapOptionsValues[option].second << "\n";
+    fmt::print(stderr, "{}\n", mapOptionsValues[option].second);
     // Box Generation
     Model box = newBox(2, 2);
     writeModel("box.3d", box);

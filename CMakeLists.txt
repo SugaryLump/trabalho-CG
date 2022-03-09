@@ -1,10 +1,15 @@
 cmake_minimum_required(VERSION 3.5)
-
 project(CG_Project)
+
+include(ExternalProject)
+
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_compile_options(-Wall)
+
+add_subdirectory(libraries/fmt)
+add_subdirectory(libraries/pugixml)
 
 add_subdirectory(src/generator)
 add_subdirectory(src/common)

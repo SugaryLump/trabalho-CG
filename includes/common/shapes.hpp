@@ -9,7 +9,7 @@ struct Vector3 {
     float y;
     float z;
 
-    Vector3() {}
+    Vector3() = default;
 
     Vector3(float newx, float newy, float newz) {
         x = newx;

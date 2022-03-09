@@ -1,8 +1,8 @@
 #include "engine/xmlParser.hpp"
 
 #include <iostream>
+#include <pugixml.hpp>
 
-#include "dependencies/pugixml.hpp"
 #include "engine/camera.hpp"
 #include "engine/config.hpp"
 

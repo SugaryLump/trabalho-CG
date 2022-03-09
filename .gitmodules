@@ -1,0 +1,6 @@
+[submodule "libraries/fmt"]
+	path = libraries/fmt
+	url = https://github.com/fmtlib/fmt
+[submodule "libraries/pugixml"]
+	path = libraries/pugixml
+	url = https://github.com/zeux/pugixml
