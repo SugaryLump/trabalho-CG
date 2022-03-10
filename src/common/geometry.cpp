@@ -24,7 +24,7 @@ Vector3::Vector3(float x_, float z_) {
 
 Vector3 Vector3::fromSpherical(float alpha, float beta, float radius) {
     float x = cos(beta) * sin(alpha) * radius;
-    float y = sin(beta);
+    float y = sin(beta) * radius;
     float z = cos(beta) * cos(alpha) * radius;
     return Vector3(x, y, z);
 }
@@ -54,7 +54,7 @@ Spherical::Spherical(float radius_, float alpha_) {
 
 Vector3 Spherical::toVector3(float centerX, float centerY, float centerZ) {
     float x = centerX + cos(beta) * sin(alpha) * radius;
-    float y = centerY + sin(beta);
+    float y = centerY + sin(beta) * radius;
     float z = centerZ + cos(beta) * cos(alpha) * radius;
     return Vector3(x, y, z);
 }
