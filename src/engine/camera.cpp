@@ -160,7 +160,7 @@ void Camera::updateFPS(InputState* input) {
     alpha -= input->getMouseDeltaX() * 0.005;
     beta += input->getMouseDeltaY() * 0.005;
     normalizeAlphaBeta();
-    Vector3 tmp = sphericalToCartesian(alpha + M_PI, -beta, radius);
+    Vector3 tmp = Vector3::fromSpherical(alpha + M_PI, -beta, radius);
     look.x = tmp.x + position.x;
     look.y = tmp.y + position.y;
     look.z = tmp.z + position.z;
@@ -169,8 +169,8 @@ void Camera::updateFPS(InputState* input) {
     int vMoveInput = input->keyAxisDirection('s', 'w');
     int hMoveInput = input->keyAxisDirection('a', 'd');
 
-    Vector3 fVector = sphericalToCartesian(alpha + M_PI, -beta, 0.075);
-    Vector3 sVector = sphericalToCartesian(alpha + M_PI_2, 0, 0.075);
+    Vector3 fVector = Vector3::fromSpherical(alpha + M_PI, -beta, 0.075);
+    Vector3 sVector = Vector3::fromSpherical(alpha + M_PI_2, 0, 0.075);
     float vertical = 0.05 * input->keyAxisDirection('c', ' ');
     position.x += fVector.x * vMoveInput + sVector.x * hMoveInput;
     position.y += fVector.y * vMoveInput + sVector.y * hMoveInput + vertical;

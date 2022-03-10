@@ -8,7 +8,7 @@
 
 #include <vector>
 
-#include "common/shapes.hpp"
+#include "common/geometry.hpp"
 
 class VBOController {
    private:

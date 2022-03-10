@@ -1,7 +1,7 @@
 #ifndef CAMERA_HPP_
 #define CAMERA_HPP_
 
-#include "common/shapes.hpp"
+#include "common/geometry.hpp"
 #include "engine/input.hpp"
 
 enum CameraType {

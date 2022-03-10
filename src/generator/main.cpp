@@ -1,70 +1,85 @@
 #include <fmt/core.h>
+#include <argparse/argparse.hpp>
 
 #include <iostream>
 #include <map>
 
-#include "common/shapes.hpp"
-#include "generator/figure.hpp"
-#include "generator/io.hpp"
-#include "generator/plane.hpp"
-
-using namespace std;
+#include "common/geometry.hpp"
 
 static char *PROGRAM_NAME;
 
-// aqui no 1 elemento podia tar associado uma funcao, q seria chamada depois
-// a string  seria o erro
-static std::map<std::string, pair<int, string>> mapOptionsValues;
-
-void printHelpPage() {
-    fmt::print(stderr,
-               "HELP PAGE:\n"
-               "Usage: {} filename option [args...]\n"
-               "Options:\n",
-               PROGRAM_NAME);
-
-    for (auto & mapOptionsValue : mapOptionsValues) {
-        fmt::print(stderr, "\t{}\n", mapOptionsValue.first);
-    }
-
-    fmt::print(stderr,
-               "\t-help\n\t-h");
-}
-
-void initializeOptionsValues(int argc, char *argv[]) {
-    int i = 1;
-    mapOptionsValues["plane"] = {i, "PLANE!!"};
-    mapOptionsValues["box"] = {++i, "BOX!!"};
-    mapOptionsValues["sphere"] = {++i, "SPHERE!!"};
-    mapOptionsValues["cone"] = {++i, "CONE!!!"};
+void printError(std::string error) {
+    std::cerr << error;
+    std::exit(1);
 }
 
 int main(int argc, char *argv[]) {
-    initializeOptionsValues(argc - 3, argv + 3);
     PROGRAM_NAME = argv[0];
+    argparse::ArgumentParser program(PROGRAM_NAME);
+    program.add_argument("filename")
+        .help("The file path to write to.");
+    program.add_argument("shape")
+        .help("[plane|box|sphere|cone]");
+    program.add_argument("parameters")
+        .help("Plane: [length] [subdivisions]\n\t\tBox: [length] [subdivisions]\n\t\tSphere: [radius] [slices] [stacks]\n\t\tCone: [radius] [height] [slices] [stacks]")
+        .remaining()
+        .scan<'f',float>();
+    
+    try {
+        program.parse_args(argc, argv);
+    }
+    catch (const std::runtime_error& err) {
+        std::cerr << program;
+        std::exit(1);
+    }
+    
+    std::string filename = program.get<std::string>("filename");
+    std::string shape = program.get<std::string>("shape");
+    std::vector<float> params = program.get<std::vector<float>>("parameters");
+    Model model;
 
-    if (argc < 3 || string(argv[1]) == "-h" || string(argv[1]) == "-help") {
-        printHelpPage();
-        return 1;
+
+    if(!shape.compare("plane")) {
+        if (params.size() != 2) {
+            std::cerr << program;
+            std::exit(1);
+        }
+        else {
+            model = Model::generatePlane(params[0], (int)params[1]);
+        }
     }
 
-    const std::string option = argv[2];
-
-    if (mapOptionsValues.find(option) == mapOptionsValues.end()) {
-        printHelpPage();
-        return 1;
+    else if (!shape.compare("box")) {
+        if (params.size() != 2) {
+            std::cerr << program;
+            std::exit(1);
+        }
+        else {
+            model = Model::generateBox(params[0], (int)params[1]);
+        }
     }
 
-    fmt::print(stderr, "{}\n", mapOptionsValues[option].second);
-    // Box Generation
-    Model box = newBox(2, 2);
-    writeModel("box.3d", box);
+    else if (!shape.compare("sphere")) {
+        if (params.size() != 3) {
+            std::cerr << program;
+            std::exit(1);
+        }
+        else {
+            model = Model::generateSphere(params[0], (int)params[1], (int)params[2]);
+        }
+    }
 
-    /*
-    //Plane Generation
-    Model plane = newBox(3, 3);
-    writeModel("plane.3d", plane);
-    */
+    else if (!shape.compare("cone")) {
+        if (params.size() != 4) {
+            std::cerr << program;
+            std::exit(1);
+        }
+        else {
+            model = Model::generateCone(params[0], params[1], (int)params[2], (int)params[3]);
+        }
+    }
+
+    model.toFile(filename);
 
     return 0;
 }

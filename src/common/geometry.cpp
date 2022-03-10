@@ -1,4 +1,4 @@
-#include "common/shapes.hpp"
+#include "common/geometry.hpp"
 
 #include <tgmath.h>
 
@@ -9,31 +9,72 @@
 
 using namespace std;
 
-Vector3 sphericalToCartesian(float alpha, float beta, float radius) {
-    float x = radius * cos(beta) * sin(alpha);
-    float y = radius * sin(beta);
-    float z = radius * cos(beta) * cos(alpha);
+//Vector3
+Vector3::Vector3(float x_, float y_, float z_) {
+    x = x_;
+    y = y_;
+    z = z_;
+}
+
+Vector3::Vector3(float x_, float z_) {
+    x = x_;
+    y = 0;
+    z = z_;
+}
+
+Vector3 Vector3::fromSpherical(float alpha, float beta, float radius) {
+    float x = cos(beta) * sin(alpha) * radius;
+    float y = sin(beta);
+    float z = cos(beta) * cos(alpha) * radius;
     return Vector3(x, y, z);
 }
 
-Vector3 polarToCartesian(float alpha, float radius, float y) {
-    float x = radius * sin(alpha);
-    float z = radius * cos(alpha);
+void Vector3::applyVector(Vector3 vector) {
+    x += vector.x;
+    y += vector.y;
+    z += vector.z;
+}
+
+
+
+
+
+//Spherical
+Spherical::Spherical(float radius_, float alpha_, float beta_) {
+    radius = radius_;
+    alpha = alpha_;
+    beta = beta_;
+}
+
+Spherical::Spherical(float radius_, float alpha_) {
+    radius = radius_;
+    alpha = alpha_;
+    beta = 0;
+}
+
+Vector3 Spherical::toVector3(float centerX, float centerY, float centerZ) {
+    float x = centerX + cos(beta) * sin(alpha) * radius;
+    float y = centerY + sin(beta);
+    float z = centerZ + cos(beta) * cos(alpha) * radius;
     return Vector3(x, y, z);
 }
 
-void Model::addVertex(Vector3 vertex) {
-    vertexes.push_back(vertex.x);
-    vertexes.push_back(vertex.y);
-    vertexes.push_back(vertex.z);
+
+
+
+
+//Triangle
+Triangle::Triangle(Vector3 v1, Vector3 v2, Vector3 v3) {
+    p1 = v1;
+    p2 = v2;
+    p3 = v3;
 }
 
-void Model::addFace(unsigned int v1, unsigned int v2, unsigned int v3) {
-    faces.push_back(v1);
-    faces.push_back(v2);
-    faces.push_back(v3);
-}
 
+
+
+
+//Model
 Model::Model(const string& path) {
     string line;
     ifstream file(path);
@@ -76,8 +117,35 @@ Model::Model(const string& path) {
     file.close();
 }
 
+void Model::toFile(std::string const &path) {
+    ofstream stream;
+    stream.open(path);
+    stream << "# Vertexes\n";
+    for (long unsigned int v = 0; v + 2 < vertices.size(); v += 3) {
+        stream << "v " << vertices[v] << " " << vertices[v + 1] << " " << vertices[v + 2] << "\n";
+    }
+
+    stream << "\n# Faces\n";
+    for (long unsigned int f = 0; f + 2 < indices.size(); f += 3) {
+        stream << "f " << indices[f] << " " << indices[f + 1] << " " << indices[f + 2] << "\n";
+    }
+    stream.close();
+}
+
+void Model::addVertex(Vector3 vertex) {
+    vertices.push_back(vertex.x);
+    vertices.push_back(vertex.y);
+    vertices.push_back(vertex.z);
+}
+
+void Model::addFace(unsigned int v1, unsigned int v2, unsigned int v3) {
+    indices.push_back(v1);
+    indices.push_back(v2);
+    indices.push_back(v3);
+}
+
 // length and subdivisions must be bigger than 0
-Model newPlane(float length, int subdivisions) {
+Model Model::generatePlane(float length, int subdivisions) {
     Model plane = Model();
     float triangleSide = length / subdivisions;
     float start = -length / 2;
@@ -105,11 +173,11 @@ Model newPlane(float length, int subdivisions) {
 }
 
 // length and subdivisions must be bigger than 0
-Model newBox(float length, int subdivisions) {
+Model Model::generateBox(float length, int subdivisions) {
     Model box = Model();
     float triangleSide = length / subdivisions;
 
-    // Plane vertexes
+    // Plane vertices
     float start = -length / 2;
     for (int x = 0; x <= subdivisions; x++) {
         for (int y = 0; y <= subdivisions; y++) {
@@ -235,20 +303,20 @@ int calcBoxVertexIndex(int x, int y, int z, int subdivisions) {
 // radius must be bigger than 0
 // slices must be bigger than 2
 // stacks must be bigger than 1
-Model newSphere(float radius, int slices, int stacks) {
+Model Model::generateSphere(float radius, int slices, int stacks) {
     Model sphere = Model();
     float beta = -M_PI / 2;
 
     // Vertexes
     for (int st = 0; st <= stacks; st++) {
         if (st == 0) {
-            sphere.addVertex(sphericalToCartesian(0, beta, radius));
+            sphere.addVertex(Vector3::fromSpherical(0, beta, radius));
         } else if (st == stacks) {
-            sphere.addVertex(sphericalToCartesian(0, M_PI / 2, radius));
+            sphere.addVertex(Vector3::fromSpherical(0, M_PI / 2, radius));
         } else {
             float alpha = 0;
             for (int sl = 0; sl < slices; sl++) {
-                sphere.addVertex(sphericalToCartesian(alpha, beta, radius));
+                sphere.addVertex(Vector3::fromSpherical(alpha, beta, radius));
                 alpha += (2 * M_PI) / slices;
             }
         }
@@ -301,7 +369,7 @@ Model newSphere(float radius, int slices, int stacks) {
 
 // radius, height and stacks must be bigger than 0
 // slices must be bigger than 2
-Model newCone(float radius, float height, float slices, float stacks) {
+Model Model::generateCone(float radius, float height, int slices, int stacks) {
     Model cone = Model();
 
     // Vertexes
@@ -310,7 +378,9 @@ Model newCone(float radius, float height, float slices, float stacks) {
     for (int st = 0; st < stacks; st++) {
         float alpha = 0;
         for (int sl = 0; sl < slices; sl++) {
-            cone.addVertex(polarToCartesian(alpha, radius - (radius / stacks * st), (height / stacks) * st));
+            Vector3 vertex = Vector3::fromSpherical(alpha, 0, radius - (radius / stacks * st));
+            vertex.applyVector(Vector3(0, height / stacks * st));
+            cone.addVertex(vertex);
             alpha += 2 * M_PI / slices;
         }
     }
