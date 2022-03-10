@@ -41,11 +41,12 @@ Camera parseCamera(pugi::xml_node node) {
 
 int parser() {
     pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_file("/home/pasok/trabalho-CG/build/src/engine/config.xml");
+    pugi::xml_parse_result result = doc.load_file("../../../config.xml");
     if (!result) {
-        std::cout << "erro: " << result;
+        std::cout << "erro: \n" << result;
         return -1;
     }
+    std::cout << "Read config.xml\n ";
 
     Config c;  // = Config::Config();
     // std::cout << doc.child("world").child("group") << std::endl;
