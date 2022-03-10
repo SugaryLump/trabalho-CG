@@ -193,95 +193,82 @@ Model Model::generateBox(float length, int subdivisions) {
         }
     }
 
-    for (int x = 0; x < subdivisions; x++) {
-        for (int y = 0; y < subdivisions; y++) {
-            for (int z = 0; z < subdivisions; z++) {
-                // Back plane
-                // v2--v1
-                //| / |
-                // v3--v4
-                //  v3 has coordinates (x,y,z)
-                if (z == 0) {
-                    int v1 = calcBoxVertexIndex(x + 1, y + 1, z, subdivisions);
-                    int v2 = calcBoxVertexIndex(x, y + 1, z, subdivisions);
-                    int v3 = calcBoxVertexIndex(x, y, z, subdivisions);
-                    int v4 = calcBoxVertexIndex(x + 1, y, z, subdivisions);
-                    box.addFace(v3, v2, v1);
-                    box.addFace(v3, v1, v4);
-                }
+    for (int i = 0; i < subdivisions; i++) {
+        for (int j = 0; j < subdivisions; j++) {
+            int v1, v2, v3, v4;
+            // Back plane
+            // v2--v1
+            //| / |
+            // v3--v4
+            //  v3 has coordinates (i,j,0)
+            v1 = calcBoxVertexIndex(i + 1, j + 1, 0, subdivisions);
+            v2 = calcBoxVertexIndex(i, j + 1, 0, subdivisions);
+            v3 = calcBoxVertexIndex(i, j, 0, subdivisions);
+            v4 = calcBoxVertexIndex(i + 1, j, 0, subdivisions);
+            box.addFace(v3, v2, v1);
+            box.addFace(v3, v1, v4);
 
-                // Front plane
-                // v2--v1
-                //| / |
-                // v3--v4
-                //  v3 has coordinates (x,y,z)
-                if (z == subdivisions - 1) {
-                    int v1 = calcBoxVertexIndex(x + 1, y + 1, z, subdivisions);
-                    int v2 = calcBoxVertexIndex(x, y + 1, z, subdivisions);
-                    int v3 = calcBoxVertexIndex(x, y, z, subdivisions);
-                    int v4 = calcBoxVertexIndex(x + 1, y, z, subdivisions);
-                    box.addFace(v3, v1, v2);
-                    box.addFace(v3, v4, v1);
-                }
+            // Front plane
+            // v2--v1
+            //| / |
+            // v3--v4
+            //  v3 has coordinates (i,j,subdivisions)
+            v1 = calcBoxVertexIndex(i + 1, j + 1, subdivisions, subdivisions);
+            v2 = calcBoxVertexIndex(i, j + 1, subdivisions, subdivisions);
+            v3 = calcBoxVertexIndex(i, j, subdivisions, subdivisions);
+            v4 = calcBoxVertexIndex(i + 1, j, subdivisions, subdivisions);
+            box.addFace(v3, v1, v2);
+            box.addFace(v3, v4, v1);
 
-                // Left plane
-                // v2-_
-                //| / v1
-                // v3-_|
-                //     v4
-                //  v3 has coordinates (x,y,z)
-                if (x == 0) {
-                    int v1 = calcBoxVertexIndex(x, y + 1, z + 1, subdivisions);
-                    int v2 = calcBoxVertexIndex(x, y + 1, z, subdivisions);
-                    int v3 = calcBoxVertexIndex(x, y, z, subdivisions);
-                    int v4 = calcBoxVertexIndex(x, y, z + 1, subdivisions);
-                    box.addFace(v3, v1, v2);
-                    box.addFace(v3, v4, v1);
-                }
+            // Left plane
+            // v2-_
+            //| / v1
+            // v3-_|
+            //     v4
+            //  v3 has coordinates (0,i,j)
+            v1 = calcBoxVertexIndex(0, i + 1, j + 1, subdivisions);
+            v2 = calcBoxVertexIndex(0, i + 1, j, subdivisions);
+            v3 = calcBoxVertexIndex(0, i, j, subdivisions);
+            v4 = calcBoxVertexIndex(0, i, j + 1, subdivisions);
+            box.addFace(v3, v1, v2);
+            box.addFace(v3, v4, v1);
 
-                // Right plane
-                // v2-_
-                //| / v1
-                // v3-_|
-                //     v4
-                //  v3 has coordinates (x,y,z)
-                if (x == subdivisions - 1) {
-                    int v1 = calcBoxVertexIndex(x, y + 1, z + 1, subdivisions);
-                    int v2 = calcBoxVertexIndex(x, y + 1, z, subdivisions);
-                    int v3 = calcBoxVertexIndex(x, y, z, subdivisions);
-                    int v4 = calcBoxVertexIndex(x, y, z + 1, subdivisions);
-                    box.addFace(v3, v2, v1);
-                    box.addFace(v3, v1, v4);
-                }
+            // Right plane
+            // v2-_
+            //| / v1
+            // v3-_|
+            //     v4
+            //  v3 has coordinates (subdivisions,i,j)
+            v1 = calcBoxVertexIndex(subdivisions, i + 1, j + 1, subdivisions);
+            v2 = calcBoxVertexIndex(subdivisions, i + 1, j, subdivisions);
+            v3 = calcBoxVertexIndex(subdivisions, i, j, subdivisions);
+            v4 = calcBoxVertexIndex(subdivisions, i, j + 1, subdivisions);
+            box.addFace(v3, v2, v1);
+            box.addFace(v3, v1, v4);
 
-                // Bottom plane
-                // v3--v2
-                //| \ |
-                // v4--v1
-                //  v3 has coordinates (x,y,z)
-                if (y == 0) {
-                    int v1 = calcBoxVertexIndex(x + 1, y, z + 1, subdivisions);
-                    int v2 = calcBoxVertexIndex(x + 1, y, z, subdivisions);
-                    int v3 = calcBoxVertexIndex(x, y, z, subdivisions);
-                    int v4 = calcBoxVertexIndex(x, y, z + 1, subdivisions);
-                    box.addFace(v3, v1, v4);
-                    box.addFace(v3, v2, v1);
-                }
+            // Bottom plane
+            // v3--v2
+            //| \ |
+            // v4--v1
+            //  v3 has coordinates (i,0,j)
+            v1 = calcBoxVertexIndex(i + 1, 0, j + 1, subdivisions);
+            v2 = calcBoxVertexIndex(i + 1, 0, j, subdivisions);
+            v3 = calcBoxVertexIndex(i, 0, j, subdivisions);
+            v4 = calcBoxVertexIndex(i, 0, j + 1, subdivisions);
+            box.addFace(v3, v1, v4);
+            box.addFace(v3, v2, v1);
 
-                // Top plane
-                // v3--v2
-                //| \ |
-                // v4--v1
-                //  v3 has coordinates (x,y,z)
-                if (y == subdivisions - 1) {
-                    int v1 = calcBoxVertexIndex(x + 1, y, z + 1, subdivisions);
-                    int v2 = calcBoxVertexIndex(x + 1, y, z, subdivisions);
-                    int v3 = calcBoxVertexIndex(x, y, z, subdivisions);
-                    int v4 = calcBoxVertexIndex(x, y, z + 1, subdivisions);
-                    box.addFace(v3, v4, v1);
-                    box.addFace(v3, v1, v2);
-                }
-            }
+            // Top plane
+            // v3--v2
+            //| \ |
+            // v4--v1
+            //  v3 has coordinates (i,subdivisions,j)
+            v1 = calcBoxVertexIndex(i + 1, subdivisions, j + 1, subdivisions);
+            v2 = calcBoxVertexIndex(i + 1, subdivisions, j, subdivisions);
+            v3 = calcBoxVertexIndex(i, subdivisions, j, subdivisions);
+            v4 = calcBoxVertexIndex(i, subdivisions, j + 1, subdivisions);
+            box.addFace(v3, v4, v1);
+            box.addFace(v3, v1, v2);
         }
     }
 
@@ -305,64 +292,49 @@ int calcBoxVertexIndex(int x, int y, int z, int subdivisions) {
 // stacks must be bigger than 1
 Model Model::generateSphere(float radius, int slices, int stacks) {
     Model sphere = Model();
-    float beta = -M_PI / 2;
+	sphere.addVertex(Vector3(0, -radius, 0));
+	sphere.addVertex(Vector3(0, radius, 0));
 
-    // Vertexes
-    for (int st = 0; st <= stacks; st++) {
-        if (st == 0) {
-            sphere.addVertex(Vector3::fromSpherical(0, beta, radius));
-        } else if (st == stacks) {
-            sphere.addVertex(Vector3::fromSpherical(0, M_PI / 2, radius));
-        } else {
-            float alpha = 0;
-            for (int sl = 0; sl < slices; sl++) {
-                sphere.addVertex(Vector3::fromSpherical(alpha, beta, radius));
-                alpha += (2 * M_PI) / slices;
-            }
-        }
+	for (int st = 0; st < stacks - 1; st++) {
+		for (int sl = 0; sl < slices; sl++) {
+            float alpha = sl * 2 * M_PI / slices;
+            float beta = -M_PI_2 + (st + 1) * M_PI / stacks;
+			sphere.addVertex(Vector3::fromSpherical(alpha, beta, radius));
+		}
+	}
 
-        beta += M_PI / (stacks - 1);
-    }
+	//Bottom and top stacks;
+	for (int sl = 0; sl < slices; sl++) {
+		if (sl < slices - 1) {
+			sphere.addFace(0, sl + 3, sl + 2);
+			sphere.addFace(1, (stacks - 2) * slices + 2 + sl, (stacks - 2) * slices + 3 + sl);
+		}
+		else {
+			sphere.addFace(0, 2, sl + 2);
+			sphere.addFace(1, (stacks - 2) * slices + 2 + sl, (stacks - 2) * slices + 2);
+		}
+	}
 
-    // Faces
-    for (int st = 0; st < stacks; st++) {
-        for (int sl = 0; sl < slices; sl++) {
-            // Top stack
-            if (st == stacks - 1) {
-                if (sl < slices - 1) {
-                    sphere.addFace(st * slices + 1, (st - 2) * slices + sl + 1, (st - 2) * slices + sl + 2);
-                } else {
-                    sphere.addFace(st * slices + 1, (st - 1) * slices, (st - 2) * slices + 1);
-                }
-            }
-            // Bottom stack
-            else if (st == 0) {
-                if (sl < slices - 1) {
-                    sphere.addFace(0, sl + 2, sl + 1);
-                } else {
-                    sphere.addFace(0, 1, slices);
-                }
-            }
-            // Middle stacks
-            else {
-                if (sl < slices - 1) {
-                    int v1 = (st - 1) * slices + 1 + sl;
-                    int v2 = st * slices + 1 + sl;
-                    int v3 = st * slices + 2 + sl;
-                    int v4 = (st - 1) * slices + 2 + sl;
-                    sphere.addFace(v1, v3, v2);
-                    sphere.addFace(v1, v4, v3);
-                } else {
-                    int v1 = (st - 1) * slices + 1 + sl;
-                    int v2 = st * slices + 1 + sl;
-                    int v3 = st * slices + 1;
-                    int v4 = (st - 1) * slices + 1;
-                    sphere.addFace(v1, v3, v2);
-                    sphere.addFace(v1, v4, v3);
-                }
-            }
-        }
-    }
+	//Middle stacks;
+	for (int st = 0; st < stacks - 2; st++) {
+		for (int sl = 0; sl < slices; sl++) {
+			int v1,v2,v3,v4;
+			if (sl < slices - 1) {
+				v1 = st * slices + 2 + sl;
+				v2 = v1 + 1;
+				v3 = v1 + slices;
+				v4 = v3 + 1;
+			}
+			else {
+				v1 = st * slices + 2 + sl;
+				v2 = st * slices + 2;
+				v3 = v1 + slices;
+				v4 = v2 + slices;
+			}
+			sphere.addFace(v1, v2, v4);
+			sphere.addFace(v1, v4, v3);
+		}
+	}
 
     return sphere;
 }
@@ -379,7 +351,7 @@ Model Model::generateCone(float radius, float height, int slices, int stacks) {
         float alpha = 0;
         for (int sl = 0; sl < slices; sl++) {
             Vector3 vertex = Vector3::fromSpherical(alpha, 0, radius - (radius / stacks * st));
-            vertex.applyVector(Vector3(0, height / stacks * st));
+            vertex.applyVector(Vector3(0, (float)height / stacks * st, 0));
             cone.addVertex(vertex);
             alpha += 2 * M_PI / slices;
         }
@@ -412,14 +384,14 @@ Model Model::generateCone(float radius, float height, int slices, int stacks) {
                     int v3 = st * slices + sl + 2;
                     int v4 = st * slices + sl + 3;
                     cone.addFace(v2, v3, v1);
-                    cone.addFace(v2, v4, v1);
+                    cone.addFace(v2, v4, v3);
                 } else {
                     int v1 = (st - 1) * slices + sl + 2;
                     int v2 = (st - 1) * slices + 2;
                     int v3 = st * slices + sl + 2;
                     int v4 = st * slices + 2;
                     cone.addFace(v2, v3, v1);
-                    cone.addFace(v2, v4, v1);
+                    cone.addFace(v2, v4, v3);
                 }
             }
         }

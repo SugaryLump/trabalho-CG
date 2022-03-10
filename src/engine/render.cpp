@@ -1,5 +1,5 @@
 #include "engine/render.hpp"
-
+#include "common/geometry.hpp"
 #include "engine/camera.hpp"
 #include "engine/input.hpp"
 
@@ -26,6 +26,7 @@ static int line = GL_FILL;
 static int windowWidth = 800;
 static int windowHeight = 800;
 static bool mouseWarping = false;
+static Model *model;
 
 void changeSize(int w, int h) {
     windowWidth = w;
@@ -80,35 +81,12 @@ void renderScene(void) {
 
     glBegin(GL_TRIANGLES);
 
-    glColor3f(0.2f, 0.4f, 1.0f);
-    glVertex3f(-1.0f, 1.0f, 0.0f);
-    glVertex3f(1.0f, 1.0f, 0.0f);
-    glVertex3f(1.0f, -1.0f, 0.0f);
-
-    glColor3f(0.2f, 0.4f, 1.0f);
-    glVertex3f(-1.0f, 1.0f, 0.0f);
-    glVertex3f(1.0f, -1.0f, 0.0f);
-    glVertex3f(-1.0f, -1.0f, 0.0f);
-
-    glColor3f(0.2f, 0.44f, 0.54f);
-    glVertex3f(1.0f, 1.0f, 0.0f);
-    glVertex3f(-1.0f, 1.0f, 0.0f);
-    glVertex3f(0.0f, 0.0f, 1.0f);
-
-    glColor3f(0.2f, 0.44f, 0.8f);
-    glVertex3f(0.0f, 0.0f, 1.0f);
-    glVertex3f(1.0f, -1.0f, 0.0f);
-    glVertex3f(1.0f, 1.0f, 0.0f);
-
-    glColor3f(0.2f, 0.44f, 0.54f);
-    glVertex3f(-1.0f, -1.0f, 0.0f);
-    glVertex3f(1.0f, -1.0f, 0.0f);
-    glVertex3f(0.0f, 0.0f, 1.0f);
-
-    glColor3f(0.2f, 0.44f, 0.8f);
-    glVertex3f(-1.0f, -1.0f, 0.0f);
-    glVertex3f(0.0f, 0.0f, 1.0f);
-    glVertex3f(-1.0f, 1.0f, 0.0f);
+    for (int f = 0; f < (int)model->indices.size(); f++) {
+        float x = model->vertices[model->indices[f]*3];
+        float y = model->vertices[model->indices[f]*3+1];
+        float z = model->vertices[model->indices[f]*3+2];
+        glVertex3f(x, y, z);
+    }
 
     glEnd();
 
@@ -183,6 +161,8 @@ void update() {
 void render(int argc, char **argv) {
     camera = new Camera();
     input = new InputState();
+    model = (Model*)malloc(sizeof(Model));
+    *model = Model::generateCone(2, 5, 100, 100);
 
     // put GLUT init here
     glutInit(&argc, argv);
