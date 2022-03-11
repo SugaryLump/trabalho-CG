@@ -83,12 +83,12 @@ Model::Model(const string& path) {
         switch (line[0]) {
             case '\n':
                 break;
-            case '#':
+            case '#': case '\000':
                 break;
             case 'v': {
                 float n1, n2, n3;
                 // TODO: Ver queixa do clang-tidy
-                if (sscanf(line.c_str(), "f %f %f %f\n", &n1, &n2, &n3) != 3) {
+                if (sscanf(line.c_str(), "v %f %f %f\n", &n1, &n2, &n3) != 3) {
                     cerr << "Error reading line: " << line << endl;
                     break;
                 }
