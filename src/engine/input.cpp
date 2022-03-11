@@ -8,6 +8,14 @@ InputState::InputState() {
     prevKeysState = new bool[KEYS_COUNT];
     specialKeysState = new bool[SPECIAL_KEYS_COUNT];
     prevSpecialKeysState = new bool[SPECIAL_KEYS_COUNT];
+    for(int k = 0; k < KEYS_COUNT; k++) {
+        keysState[k] = 0;
+        prevKeysState[k] = 0;
+    }
+    for (int k = 0; k < SPECIAL_KEYS_COUNT; k++) {
+        specialKeysState[k] = 0;
+        prevSpecialKeysState[k] = 0;
+    }
     mouseDeltaX = 0;
     mouseDeltaY = 0;
 }
