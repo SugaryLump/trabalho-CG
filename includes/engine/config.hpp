@@ -6,6 +6,7 @@
 
 struct Config {
     Camera camera;
+    std::vector<Model> models;
 
     Config();
 };

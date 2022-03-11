@@ -1,4 +1,5 @@
 #include "engine/render.hpp"
+
 #include "common/geometry.hpp"
 #include "engine/camera.hpp"
 #include "engine/input.hpp"
@@ -6,18 +7,23 @@
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
-#include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <GL/glut.h>
 #endif
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <stdio.h>
 
+#include <iostream>
+using namespace std;
 namespace Render {
 
-static Camera *camera;
+static Camera camera;
+static std::vector<Model> models;
+// FIXME delete
+// static Model *model;
 static InputState *input;
 
 static float SCALE = 1;
@@ -26,7 +32,6 @@ static int line = GL_FILL;
 static int windowWidth = 800;
 static int windowHeight = 800;
 static bool mouseWarping = false;
-static Model *model;
 
 void changeSize(int w, int h) {
     windowWidth = w;
@@ -54,8 +59,8 @@ void renderScene(void) {
     // set camera
     glLoadIdentity();
 
-    gluLookAt(camera->position.x, camera->position.y, camera->position.z, camera->look.x, camera->look.y,
-              camera->look.z, camera->up.x, camera->up.y, camera->up.z);
+    gluLookAt(camera.position.x, camera.position.y, camera.position.z, camera.look.x, camera.look.y, camera.look.z,
+              camera.up.x, camera.up.y, camera.up.z);
 
     if (SHOW_AXIS) {
         // Axis
@@ -81,11 +86,13 @@ void renderScene(void) {
 
     glBegin(GL_TRIANGLES);
 
-    for (int f = 0; f < (int)model->indices.size(); f++) {
-        float x = model->vertices[model->indices[f]*3];
-        float y = model->vertices[model->indices[f]*3+1];
-        float z = model->vertices[model->indices[f]*3+2];
-        glVertex3f(x, y, z);
+    for (Model model : models) {
+        for (int f = 0; f < (int) model.indices.size(); f++) {
+            float x = model.vertices[model.indices[f] * 3];
+            float y = model.vertices[model.indices[f] * 3 + 1];
+            float z = model.vertices[model.indices[f] * 3 + 2];
+            glVertex3f(x, y, z);
+        }
     }
 
     glEnd();
@@ -111,7 +118,7 @@ void specialKeyReleaseHandler(int key, int x, int y) {
 }
 
 void passiveMouseHandler(int x, int y) {
-    if (camera->currentType == FPS) {
+    if (camera.currentType == FPS) {
         if (!mouseWarping) {
             input->updateMouseDelta(x, y, windowWidth / 2, windowHeight / 2);
             mouseWarping = true;
@@ -145,8 +152,8 @@ void update() {
     if (input->keyTapped('q')) { exit(0); }
 
     // Updates
-    camera->update(input);
-    if (camera->currentType == FPS) {
+    camera.update(input);
+    if (camera.currentType == FPS) {
         glutSetCursor(GLUT_CURSOR_NONE);
     } else {
         glutSetCursor(GLUT_CURSOR_INHERIT);
@@ -158,11 +165,22 @@ void update() {
     renderScene();
 }
 
-void render(int argc, char **argv) {
-    camera = new Camera();
+void render(int argc, char **argv, Config config) {
+    camera = config.camera;
+    // std::cout << camera.position.x << "\n"
+    //           << camera.position.y << "\n"
+    //           << camera.position.z << "\n"
+    //           << camera.look.x << "\n"
+    //           << camera.look.y << "\n"
+    //           << camera.look.z << "\n"
+    //           << camera.up.x << "\n"
+    //           << camera.up.y << "\n"
+    //           << camera.up.z << "\n";
+    // camera = Camera();
+
     input = new InputState();
-    model = (Model*)malloc(sizeof(Model));
-    *model = Model::generateCone(2, 5, 100, 100);
+    // models.push_back(Model::generateCone(2, 5, 100, 100));
+    models = config.models;
 
     // put GLUT init here
     glutInit(&argc, argv);

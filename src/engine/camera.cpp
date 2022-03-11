@@ -34,22 +34,20 @@ Camera::Camera(float near, float far, float fov) {
     fov = fov;
 }
 
-Camera::Camera(Vector3 newLook, Vector3 newUp, Vector3 newPosition, float near, float far, float fov) {
-    look.x = newLook.x;
-    look.y = newLook.y;
-    look.z = newLook.z;
+Camera::Camera(Vector3 newLook, Vector3 newUp, Vector3 newPosition, float newNear, float newFar, float newFov) {
+    currentType = FOLLOW;
 
-    up.x = newUp.x;
-    up.y = newUp.y;
-    up.z = newUp.z;
+    radius = 10.0;
+    alpha = 0;
+    beta = 0;
 
-    position.x = newPosition.x;
-    position.y = newPosition.y;
-    position.z = newPosition.z;
+    look = newLook;
+    up = newUp;
+    position = newPosition;
 
-    near = near;
-    far = far;
-    fov = fov;
+    near = newNear;
+    far = newFar;
+    fov = newFov;
 }
 
 void Camera::posInitialCamera() {
@@ -59,17 +57,9 @@ void Camera::posInitialCamera() {
     alpha = 0;
     beta = 0;
 
-    look.x = 0.0;
-    look.y = 0.0;
-    look.z = 0.0;
-
-    up.x = 0.0f;
-    up.y = 1.0f;
-    up.z = 0.0f;
-
-    position.x = 0;
-    position.z = 10;
-    position.y = 0;
+    look = {0.0, 0.0, 0.0};
+    up = {0.0f, 1.0f, 0.0f};
+    position = {0.0, 10.0, 0.0};
 
     near = 1;
     far = 1000;
@@ -93,23 +83,13 @@ void Camera::changeTypeCamera(CameraType newType) {
 }
 
 void Camera::setFollowPoint(Vector3 point) {
-    look.x = point.x;
-    look.y = point.y;
-    look.z = point.z;
+    look = point;
 }
 
 void Camera::setup(Vector3 newLook, Vector3 newUp, Vector3 newPosition) {
-    look.x = newLook.x;
-    look.y = newLook.y;
-    look.z = newLook.z;
-
-    up.x = newUp.x;
-    up.y = newUp.y;
-    up.z = newUp.z;
-
-    position.x = newPosition.x;
-    position.y = newPosition.y;
-    position.z = newPosition.z;
+    look = newLook;
+    up = newUp;
+    position = newPosition;
 }
 
 void Camera::setNextTypeCamera() {

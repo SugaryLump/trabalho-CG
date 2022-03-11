@@ -3,9 +3,6 @@
 #include <iostream>
 #include <pugixml.hpp>
 
-#include "engine/camera.hpp"
-#include "engine/config.hpp"
-
 using namespace std;
 
 namespace Parser {
@@ -35,30 +32,50 @@ Camera parseCamera(pugi::xml_node node) {
     float far = stof(pos.attribute("far").value());
     float fov = stof(pos.attribute("fov").value());
 
-    Camera c = Camera(up, position, look, near, far, fov);
+    Camera c = Camera(look, up, position, near, far, fov);
     return c;
 }
 
-int parser() {
+std::vector<Model> parseModels(pugi::xml_node node) {
+    std::vector<Model> models;
+    for (pugi::xml_node node : node.child("models")) {
+        string name = node.name();
+        if (!name.compare("model")) {
+            const char* filename = node.attribute("file").value();
+            models.push_back(Model(filename));
+        }
+    }
+    return models;
+}
+
+Config parser(char* filename) {
     pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_file("../../../config.xml");
+    pugi::xml_parse_result result = doc.load_file(filename);
     if (!result) {
-        std::cout << "erro: \n" << result;
-        return -1;
+        std::cout << "erro: " << result << "\n";
+        // FIXME CHANGE THIS
+        throw "error";
+        // return -1;
     }
     std::cout << "Read config.xml\n ";
 
-    Config c;  // = Config::Config();
+    Config c = Config();
     // std::cout << doc.child("world").child("group") << std::endl;
-
     // Camera c;
     for (pugi::xml_node node : doc.child("world")) {
         string name = node.name();
-        // FIXME Falta inicializar o config
-        if (!name.compare("camera")) { c.camera = parseCamera(node); }
-        // else if(!name.compare("group")) {
-        // }
+        if (!name.compare("camera")) {
+            // FIXME dar free da camera default q ja tinha
+            c.camera = parseCamera(node);
+        } else if (!name.compare("group")) {
+            try {
+                c.models = parseModels(node);
+            } catch (exception e) { std::cout << e.what() << "\n"; }
+            std::cout << "Li X modelos :: " << c.models.size() << endl;
+            std::cout << c.models[0].vertices.size() << "\n";
+            std::cout << c.models[0].indices.size() << "\n";
+        }
     }
-    return 0;
+    return c;
 }
 }  // namespace Parser
