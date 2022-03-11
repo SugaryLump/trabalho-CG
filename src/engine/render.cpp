@@ -77,10 +77,58 @@ void renderScene(void) {
 
     glScalef(SCALE, SCALE, SCALE);
 
-    glPolygonMode(GL_FRONT_AND_BACK, line);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     glBegin(GL_TRIANGLES);
+    glColor3f(1,1,1);
 
+    glVertex3f(-20,-20,-20);
+    glVertex3f(-20,20,20);
+    glVertex3f(-20,-20,20);
+    glVertex3f(-20,-20,-20);
+    glVertex3f(-20,20,-20);
+    glVertex3f(-20,20,20);
+
+    glVertex3f(20,-20,-20);
+    glVertex3f(20,-20,20);
+    glVertex3f(20,20,20);
+    glVertex3f(20,-20,-20);
+    glVertex3f(20,20,20);
+    glVertex3f(20,20,-20);
+
+    glVertex3f(-20,-20,-20);
+    glVertex3f(20,-20,-20);
+    glVertex3f(20,20,-20);
+    glVertex3f(-20,-20,-20);
+    glVertex3f(20,20,-20);
+    glVertex3f(-20,20,-20);
+
+    glVertex3f(-20,-20,20);
+    glVertex3f(20,20,20);
+    glVertex3f(20,-20,20);
+    glVertex3f(-20,-20,20);
+    glVertex3f(-20,20,20);
+    glVertex3f(20,20,20);
+
+    glVertex3f(-20,-20,-20);
+    glVertex3f(-20,-20,20);
+    glVertex3f(20,-20,20);
+    glVertex3f(20,-20,-20);
+    glVertex3f(-20,-20,-20);
+    glVertex3f(20,-20,20);
+
+    glVertex3f(-20,20,-20);
+    glVertex3f(20,20,20);
+    glVertex3f(-20,20,20);
+    glVertex3f(20,20,-20);
+    glVertex3f(20,20,20);
+    glVertex3f(-20,20,-20);
+
+    glEnd();
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glBegin(GL_TRIANGLES);
+
+    glColor3f(0,0,0);
     for (int f = 0; f < (int)model->indices.size(); f++) {
         float x = model->vertices[model->indices[f]*3];
         float y = model->vertices[model->indices[f]*3+1];
@@ -90,6 +138,16 @@ void renderScene(void) {
 
     glEnd();
 
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    GLUquadric* quad = gluNewQuadric();
+    for (int f = 0; f+3 <= (int)model->vertices.size(); f+=3) {
+        glPushMatrix();
+        glTranslatef(model->vertices[f], model->vertices[f+1], model->vertices[f+2]);
+        glBegin(GL_TRIANGLES);
+        gluSphere(quad, 0.02, 10, 10);
+        glPopMatrix();
+        glEnd();
+    }
     // End of frame
     glutSwapBuffers();
 }
@@ -162,7 +220,7 @@ void render(int argc, char **argv) {
     camera = new Camera();
     input = new InputState();
     model = (Model*)malloc(sizeof(Model));
-    *model = Model::generateCone(2, 5, 100, 100);
+    *model = Model::generateSphere(1, 6, 3);
 
     // put GLUT init here
     glutInit(&argc, argv);
@@ -175,7 +233,7 @@ void render(int argc, char **argv) {
     glPolygonMode(GL_FRONT, GL_FILL);
     glEnable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     // glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     // put callback registry here
