@@ -1,5 +1,6 @@
+#include <cstdlib>
 #include "engine/vbo.hpp"
-
+#include "common/geometry.hpp"
 #include <vector>
 
 VBOController::VBOController(std::vector<Model> models) {

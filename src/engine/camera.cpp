@@ -1,4 +1,6 @@
+#include <cstdlib>
 #include "engine/camera.hpp"
+#include "common/geometry.hpp"
 
 #include <iostream>
 
@@ -26,6 +28,8 @@ void Camera::normalizeAlphaBeta() {
         beta = -M_PI_2 + 0.01;
     }
 }
+
+Camera::Camera() { posInitialCamera(); }
 
 Camera::Camera(float near, float far, float fov) {
     posInitialCamera();
@@ -57,9 +61,9 @@ void Camera::posInitialCamera() {
     alpha = 0;
     beta = 0;
 
-    look = {0.0, 0.0, 0.0};
-    up = {0.0f, 1.0f, 0.0f};
-    position = {0.0, 10.0, 0.0};
+    look = Vector3(0.0, 0.0, 0.0);
+    up = Vector3(0.0f, 1.0f, 0.0f);
+    position = Vector3(0.0, 10.0, 0.0);
 
     near = 1;
     far = 1000;
@@ -107,15 +111,15 @@ void Camera::setNextTypeCamera() {
     }
 }
 
-void Camera::update(InputState* input) {
+void Camera::update(InputState* input, float rateModifier) {
     if (input->keyTapped('f')) { setNextTypeCamera(); }
 
     switch (currentType) {
         case FOLLOW:
-            updateFollow(input);
+            updateFollow(input, rateModifier);
             break;
         case FPS:
-            updateFPS(input);
+            updateFPS(input, rateModifier);
             break;
         default:
             break;
@@ -123,11 +127,11 @@ void Camera::update(InputState* input) {
 }
 /*** FOLLOW *****/
 
-void Camera::updateFollow(InputState* input) {
-    alpha += 0.03 * (input->specialKeyAxisDirection(GLUT_KEY_LEFT, GLUT_KEY_RIGHT));
-    beta += 0.03 * (input->specialKeyAxisDirection(GLUT_KEY_DOWN, GLUT_KEY_UP));
+void Camera::updateFollow(InputState* input, float rateModifier) {
+    alpha += 0.03 * rateModifier * (input->specialKeyAxisDirection(GLUT_KEY_LEFT, GLUT_KEY_RIGHT));
+    beta += 0.03 * rateModifier * (input->specialKeyAxisDirection(GLUT_KEY_DOWN, GLUT_KEY_UP));
     normalizeAlphaBeta();
-    radius += 0.05 * (input->specialKeyAxisDirection(GLUT_KEY_F1, GLUT_KEY_F2));
+    radius += 0.05 * rateModifier * (input->specialKeyAxisDirection(GLUT_KEY_F1, GLUT_KEY_F2));
 
     position.x = look.x + radius * cos(beta) * sin(alpha);
     position.z = look.z + radius * cos(beta) * cos(alpha);
@@ -135,10 +139,10 @@ void Camera::updateFollow(InputState* input) {
 }
 
 // FPS
-void Camera::updateFPS(InputState* input) {
+void Camera::updateFPS(InputState* input, float rateModifier) {
     // Mouse Handler
-    alpha -= input->getMouseDeltaX() * 0.005;
-    beta += input->getMouseDeltaY() * 0.005;
+    alpha -= input->getMouseDeltaX() * 0.015 * rateModifier;
+    beta += input->getMouseDeltaY() * 0.015 * rateModifier;
     normalizeAlphaBeta();
     Vector3 tmp = Vector3::fromSpherical(alpha + M_PI, -beta, radius);
     look.x = tmp.x + position.x;
@@ -152,10 +156,10 @@ void Camera::updateFPS(InputState* input) {
     Vector3 fVector = Vector3::fromSpherical(alpha + M_PI, -beta, 0.075);
     Vector3 sVector = Vector3::fromSpherical(alpha + M_PI_2, 0, 0.075);
     float vertical = 0.05 * input->keyAxisDirection('c', ' ');
-    position.x += fVector.x * vMoveInput + sVector.x * hMoveInput;
-    position.y += fVector.y * vMoveInput + sVector.y * hMoveInput + vertical;
-    position.z += fVector.z * vMoveInput + sVector.z * hMoveInput;
-    look.x += fVector.x * vMoveInput + sVector.x * hMoveInput;
-    look.y += fVector.y * vMoveInput + sVector.y * hMoveInput;
-    look.z += fVector.z * vMoveInput + sVector.z * hMoveInput;
+    position.x += (fVector.x * vMoveInput + sVector.x * hMoveInput) * rateModifier;
+    position.y += (fVector.y * vMoveInput + sVector.y * hMoveInput + vertical) * rateModifier;
+    position.z += (fVector.z * vMoveInput + sVector.z * hMoveInput) * rateModifier;
+    look.x += (fVector.x * vMoveInput + sVector.x * hMoveInput) * rateModifier;
+    look.y += (fVector.y * vMoveInput + sVector.y * hMoveInput) * rateModifier;
+    look.z += (fVector.z * vMoveInput + sVector.z * hMoveInput) * rateModifier;
 }

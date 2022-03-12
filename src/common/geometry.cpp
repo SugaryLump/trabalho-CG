@@ -1,5 +1,5 @@
 #include "common/geometry.hpp"
-
+#define _USE_MATH_DEFINES
 #include <tgmath.h>
 
 #include <fstream>

@@ -36,21 +36,24 @@ if  (WIN32)
 	if (NOT EXISTS "${TOOLKITS_FOLDER}/glut/GL/glut.h" OR NOT EXISTS "${TOOLKITS_FOLDER}/glut/glut32.lib")
 		message(ERROR ": GLUT not found")
 	endif (NOT EXISTS "${TOOLKITS_FOLDER}/glut/GL/glut.h" OR NOT EXISTS "${TOOLKITS_FOLDER}/glut/glut32.lib")
+	
+	if (NOT EXISTS "${TOOLKITS_FOLDER}/glew/GL/glew.h" OR NOT EXISTS "${TOOLKITS_FOLDER}/glew/glew32.lib")
+		message(ERROR ": GLEW not found")
+	endif (NOT EXISTS "${TOOLKITS_FOLDER}/glew/GL/glew.h" OR NOT EXISTS "${TOOLKITS_FOLDER}/glew/glew32.lib")	
 
 
-	include_directories(${TOOLKITS_FOLDER}/glut )
-	target_link_libraries(
-      ${OPENGL_LIBRARIES}
-	  ${TOOLKITS_FOLDER}/glut/glut32.lib
-      engine
-      common
-      )
+	target_include_directories(engine PRIVATE ${TOOLKITS_FOLDER}/glut ${TOOLKITS_FOLDER}/glew)
+	target_link_libraries(engine ${OPENGL_LIBRARIES}
+								 ${TOOLKITS_FOLDER}/glut/glut32.lib
+								 ${TOOLKITS_FOLDER}/glew/glew32.lib
+								 common )
 
-	if (EXISTS "${TOOLKITS_FOLDER}/glut/glut32.dll" )
+	if (EXISTS "${TOOLKITS_FOLDER}/glut/glut32.dll" AND EXISTS "${TOOLKITS_FOLDER}/glew/glew32.dll")
 		file(COPY ${TOOLKITS_FOLDER}/glut/glut32.dll DESTINATION ${CMAKE_BINARY_DIR})
-	endif(EXISTS "${TOOLKITS_FOLDER}/glut/glut32.dll" )
+		file(COPY ${TOOLKITS_FOLDER}/glew/glew32.dll DESTINATION ${CMAKE_BINARY_DIR})
+	endif(EXISTS "${TOOLKITS_FOLDER}/glut/glut32.dll" AND EXISTS "${TOOLKITS_FOLDER}/glew/glew32.dll")
 
-	# set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT engine)
 
 else (WIN32) #Linux and Mac
 
@@ -60,6 +63,15 @@ else (WIN32) #Linux and Mac
 	link_directories(${GLUT_LIBRARY_DIRS})
 	add_definitions(${GLUT_DEFINITIONS})
 
+	if (NOT APPLE)
+		find_package(GLEW REQUIRED)
+		include_directories(${GLEW_INCLUDE_DIRS})
+		link_libraries(${GLEW_LIBRARIES})
+		target_link_libraries(engine ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} ${GLEW_LIBRARIES})
+	else (NOT APPLE)
+		target_link_libraries(engine ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} )
+	endif(NOT APPLE)
+	
     target_link_libraries(
       engine
       common

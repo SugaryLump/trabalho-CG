@@ -1,6 +1,4 @@
-#ifndef CAMERA_HPP_
-#define CAMERA_HPP_
-
+#pragma once
 #include "common/geometry.hpp"
 #include "engine/input.hpp"
 
@@ -23,7 +21,7 @@ struct Camera {
     float alpha, beta;
     float radius;
 
-    Camera() { posInitialCamera(); }
+    Camera();
     Camera(float near, float far, float fov);
     Camera(Vector3 newLook, Vector3 newUp, Vector3 newPosition, float near, float far, float fov);
     float getNear();
@@ -34,10 +32,10 @@ struct Camera {
     void changeTypeCamera(CameraType newType);
     void setFollowPoint(Vector3 point);
     void setNextTypeCamera();
-    void update(InputState* input);
+    void update(InputState* input, float rateModifier);
 
     // FOLLOW
-    void updateFollow(InputState* input);
+    void updateFollow(InputState* input, float rateModifier);
     void followMoveUp();
     void followMoveDown();
     void followMoveLefth();
@@ -47,7 +45,5 @@ struct Camera {
     void followProcessSpecialKeys(int key, int _x, int _y);
 
     // FPS
-    void updateFPS(InputState* input);
+    void updateFPS(InputState* input, float rateModifier);
 };
-
-#endif  // CAMERA_HPP_

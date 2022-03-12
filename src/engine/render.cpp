@@ -1,8 +1,14 @@
+#include <cstdlib>
 #include "engine/render.hpp"
 
 #include "common/geometry.hpp"
 #include "engine/camera.hpp"
 #include "engine/input.hpp"
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <stdio.h>
+
+#include <iostream>
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -12,12 +18,6 @@
 #include <GL/glut.h>
 #endif
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-#include <stdio.h>
-
-#include <iostream>
-using namespace std;
 namespace Render {
 
 static Camera camera;
@@ -32,6 +32,7 @@ static int line = GL_FILL;
 static int windowWidth = 800;
 static int windowHeight = 800;
 static bool mouseWarping = false;
+static int timebase;
 
 void changeSize(int w, int h) {
     windowWidth = w;
@@ -130,8 +131,14 @@ void passiveMouseHandler(int x, int y) {
 }
 
 void update() {
+    // Framerates
+    int time = glutGet(GLUT_ELAPSED_TIME);
+    float fps = 1000.0f / (time - timebase);
+    timebase = time;
+    float rateModifier = 60 / fps;
+
     // Handle inputs
-    SCALE += input->keyAxisDirection('-', '+') * 0.01;
+    SCALE += input->keyAxisDirection('-', '+') * 0.01 * rateModifier;
 
     if (input->keyTapped('.')) { SHOW_AXIS = !SHOW_AXIS; }
 
@@ -152,7 +159,7 @@ void update() {
     if (input->keyTapped('q')) { exit(0); }
 
     // Updates
-    camera.update(input);
+    camera.update(input, rateModifier);
     if (camera.currentType == FPS) {
         glutSetCursor(GLUT_CURSOR_NONE);
     } else {
@@ -188,6 +195,7 @@ void render(int argc, char **argv, Config config) {
     glutInitWindowPosition(100, 100);
     glutInitWindowSize(800, 800);
     glutCreateWindow("CG-Engine");
+    timebase = glutGet(GLUT_ELAPSED_TIME);
 
     // some OpenGL settings
     glPolygonMode(GL_FRONT, GL_FILL);
