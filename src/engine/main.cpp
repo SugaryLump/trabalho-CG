@@ -32,7 +32,5 @@ int main(int argc, char *argv[]) {
     Config config = Parser::parser(filename);
     // Config config;
 
-    Render::render(argc, argv, config);
-
-    return 0;
+    return Render::render(argc, argv, config);
 }

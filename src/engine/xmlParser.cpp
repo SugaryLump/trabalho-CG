@@ -53,27 +53,18 @@ Config parser(char* filename) {
     pugi::xml_parse_result result = doc.load_file(filename);
     if (!result) {
         std::cout << "erro: " << result << "\n";
-        // FIXME CHANGE THIS
         throw "error";
-        // return -1;
     }
-    std::cout << "Read config.xml\n ";
 
     Config c = Config();
-    // std::cout << doc.child("world").child("group") << std::endl;
-    // Camera c;
     for (pugi::xml_node node : doc.child("world")) {
         string name = node.name();
         if (!name.compare("camera")) {
-            // FIXME dar free da camera default q ja tinha
             c.camera = parseCamera(node);
         } else if (!name.compare("group")) {
             try {
                 c.models = parseModels(node);
             } catch (exception e) { std::cout << e.what() << "\n"; }
-            std::cout << "Li X modelos :: " << c.models.size() << endl;
-            std::cout << c.models[0].vertices.size() << "\n";
-            std::cout << c.models[0].indices.size() << "\n";
         }
     }
     return c;

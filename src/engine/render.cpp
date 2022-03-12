@@ -1,25 +1,35 @@
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
+#include <GL/glew.h>
+#include <GL/glut.h>
+#endif
+
 #include <cstdlib>
-#include "engine/render.hpp"
 
 #include "common/geometry.hpp"
 #include "engine/camera.hpp"
 #include "engine/input.hpp"
+#include "engine/render.hpp"
+#include "engine/vbo.hpp"
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <stdio.h>
 
 #include <iostream>
 
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glut.h>
-#endif
+// #ifdef __APPLE__
+// #include <GLUT/glut.h>
+// #else
+// #include <GL/gl.h>
+// #include <GL/glew.h>
+// #include <GL/glu.h>
+// #include <GL/glut.h>
+// #endif
 
 namespace Render {
 
+static Config config;
 static Camera camera;
 static std::vector<Model> models;
 // FIXME delete
@@ -33,6 +43,10 @@ static int windowWidth = 800;
 static int windowHeight = 800;
 static bool mouseWarping = false;
 static int timebase;
+
+GLuint buffer;
+std::vector<unsigned int> indices;
+size_t _n_indices;
 
 void changeSize(int w, int h) {
     windowWidth = w;
@@ -85,18 +99,32 @@ void renderScene(void) {
 
     glPolygonMode(GL_FRONT_AND_BACK, line);
 
-    glBegin(GL_TRIANGLES);
+    // glBegin(GL_TRIANGLES);
+    // for (Model model : models) {
+    //     for (int f = 0; f < (int) model.indices.size(); f++) {
+    //         if (f % 3 == 0) {
+    //             glColor3f(0.0, 0.185, 0.252);
+    //             // glColor3f(0.2f, 0.44f, 0.54f);
+    //         } else if (f % 2 == 0) {
+    //             glColor3f(0.183, 0.26, 0.231);
+    //         } else {
+    //             glColor3f(0.126, 0.14, 0.189);
+    //         }
+    //         float x = model.vertices[model.indices[f] * 3];
+    //         float y = model.vertices[model.indices[f] * 3 + 1];
+    //         float z = model.vertices[model.indices[f] * 3 + 2];
+    //         glVertex3f(x, y, z);
+    //     }
+    // }
+    // glEnd();
 
-    for (Model model : models) {
-        for (int f = 0; f < (int) model.indices.size(); f++) {
-            float x = model.vertices[model.indices[f] * 3];
-            float y = model.vertices[model.indices[f] * 3 + 1];
-            float z = model.vertices[model.indices[f] * 3 + 2];
-            glVertex3f(x, y, z);
-        }
-    }
+    config.drawModels();
 
-    glEnd();
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
+    glVertexPointer(3, GL_FLOAT, 0, 0);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
+    glDrawElements(GL_TRIANGLES, _n_indices, GL_UNSIGNED_INT, (void *) 0);
 
     // End of frame
     glutSwapBuffers();
@@ -172,7 +200,8 @@ void update() {
     renderScene();
 }
 
-void render(int argc, char **argv, Config config) {
+int render(int argc, char **argv, Config config) {
+    config = config;
     camera = config.camera;
     // std::cout << camera.position.x << "\n"
     //           << camera.position.y << "\n"
@@ -202,7 +231,14 @@ void render(int argc, char **argv, Config config) {
     glEnable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    // glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+// init GLEW
+#ifndef __APPLE__
+    if (glewInit() != GLEW_OK) {
+        std::cout << "Some problem with GLEW!" << std::endl;
+        return -1;
+    }
+#endif
 
     // put callback registry here
     glutDisplayFunc(renderScene);
@@ -216,8 +252,20 @@ void render(int argc, char **argv, Config config) {
     glutSpecialUpFunc(specialKeyReleaseHandler);
     glutPassiveMotionFunc(passiveMouseHandler);
 
+    //  OpenGL settings
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glPolygonMode(GL_FRONT, GL_LINE);
+
+    // Draw vbos
+    config.drawModels();
+    // config.drawModel(config.models[0]);
+
     // enter GLUTs main cycle
     glutMainLoop();
+
+    return 0;
 }
 
 }  // namespace Render

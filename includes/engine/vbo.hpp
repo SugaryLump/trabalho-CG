@@ -21,3 +21,8 @@ class VBOController {
 
     void drawModels();
 };
+
+namespace VBO {
+void drawModels(std::vector<Model> const& models);
+void drawModel(Model const& model);
+}

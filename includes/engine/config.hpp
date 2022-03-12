@@ -9,6 +9,9 @@ struct Config {
     std::vector<Model> models;
 
     Config();
+
+    void drawModels();
+    void drawModel(Model const& model);
 };
 
 #endif  // Config_HPP_
