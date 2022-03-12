@@ -22,9 +22,9 @@ void Camera::normalizeAlphaBeta() {
         alpha += 2 * M_PI;
     }
 
-    if (beta > M_PI_2) {
+    if (beta > M_PI_2 - 0.01) {
         beta = M_PI_2 - 0.01;
-    } else if (beta < -M_PI_2) {
+    } else if (beta < -M_PI_2 + 0.01) {
         beta = -M_PI_2 + 0.01;
     }
 }
@@ -141,8 +141,8 @@ void Camera::updateFollow(InputState* input, float rateModifier) {
 // FPS
 void Camera::updateFPS(InputState* input, float rateModifier) {
     // Mouse Handler
-    alpha -= input->getMouseDeltaX() * 0.015 * rateModifier;
-    beta += input->getMouseDeltaY() * 0.015 * rateModifier;
+    alpha -= input->getMouseDeltaX() * 0.003;
+    beta += input->getMouseDeltaY() * 0.003;
     normalizeAlphaBeta();
     Vector3 tmp = Vector3::fromSpherical(alpha + M_PI, -beta, radius);
     look.x = tmp.x + position.x;
