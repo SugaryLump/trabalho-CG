@@ -57,7 +57,7 @@ Config parser(char* filename) {
         throw "error";
         // return -1;
     }
-    std::cout << "Read config.xml\n ";
+    // std::cout << "Read config.xml\n ";
 
     Config c = Config();
     // std::cout << doc.child("world").child("group") << std::endl;
@@ -71,9 +71,9 @@ Config parser(char* filename) {
             try {
                 c.models = parseModels(node);
             } catch (exception e) { std::cout << e.what() << "\n"; }
-            std::cout << "Li X modelos :: " << c.models.size() << endl;
-            std::cout << c.models[0].vertices.size() << "\n";
-            std::cout << c.models[0].indices.size() << "\n";
+            // std::cout << "Li X modelos :: " << c.models.size() << endl;
+            // std::cout << c.models[0].vertices.size() << "\n";
+            // std::cout << c.models[0].indices.size() << "\n";
         }
     }
     return c;

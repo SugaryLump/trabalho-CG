@@ -1,5 +1,6 @@
-#include <cstdlib>
 #include "engine/render.hpp"
+
+#include <cstdlib>
 
 #include "common/geometry.hpp"
 #include "engine/camera.hpp"
@@ -60,6 +61,16 @@ void renderScene(void) {
     // set camera
     glLoadIdentity();
 
+    // std::cout << "position\n " << camera.position.x << "\n"
+    //           << camera.position.y << "\n"
+    //           << camera.position.z << "\n"
+    //           << camera.look.x << "\n"
+    //           << camera.look.y << "\n"
+    //           << camera.look.z << "\n"
+    //           << camera.up.x << "\n"
+    //           << camera.up.y << "\n"
+    //           << camera.up.z << "\n";
+
     gluLookAt(camera.position.x, camera.position.y, camera.position.z, camera.look.x, camera.look.y, camera.look.z,
               camera.up.x, camera.up.y, camera.up.z);
 
@@ -86,9 +97,16 @@ void renderScene(void) {
     glPolygonMode(GL_FRONT_AND_BACK, line);
 
     glBegin(GL_TRIANGLES);
-
     for (Model model : models) {
         for (int f = 0; f < (int) model.indices.size(); f++) {
+            if (f % 3 == 0) {
+                glColor3f(0.0, 0.185, 0.252);
+                // glColor3f(0.2f, 0.44f, 0.54f);
+            } else if (f % 2 == 0) {
+                glColor3f(0.183, 0.26, 0.231);
+            } else {
+                glColor3f(0.126, 0.14, 0.189);
+            }
             float x = model.vertices[model.indices[f] * 3];
             float y = model.vertices[model.indices[f] * 3 + 1];
             float z = model.vertices[model.indices[f] * 3 + 2];
@@ -174,17 +192,6 @@ void update() {
 
 void render(int argc, char **argv, Config config) {
     camera = config.camera;
-    // std::cout << camera.position.x << "\n"
-    //           << camera.position.y << "\n"
-    //           << camera.position.z << "\n"
-    //           << camera.look.x << "\n"
-    //           << camera.look.y << "\n"
-    //           << camera.look.z << "\n"
-    //           << camera.up.x << "\n"
-    //           << camera.up.y << "\n"
-    //           << camera.up.z << "\n";
-    // camera = Camera();
-
     input = new InputState();
     // models.push_back(Model::generateCone(2, 5, 100, 100));
     models = config.models;

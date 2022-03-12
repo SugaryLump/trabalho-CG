@@ -1,9 +1,9 @@
-#include <cstdlib>
 #include "engine/camera.hpp"
-#include "common/geometry.hpp"
 
+#include <cstdlib>
 #include <iostream>
 
+#include "common/geometry.hpp"
 #include "engine/input.hpp"
 
 #define _USE_MATH_DEFINES
@@ -29,7 +29,9 @@ void Camera::normalizeAlphaBeta() {
     }
 }
 
-Camera::Camera() { posInitialCamera(); }
+Camera::Camera() {
+    posInitialCamera();
+}
 
 Camera::Camera(float near, float far, float fov) {
     posInitialCamera();
@@ -41,13 +43,14 @@ Camera::Camera(float near, float far, float fov) {
 Camera::Camera(Vector3 newLook, Vector3 newUp, Vector3 newPosition, float newNear, float newFar, float newFov) {
     currentType = FOLLOW;
 
-    radius = 10.0;
-    alpha = 0;
-    beta = 0;
-
     look = newLook;
     up = newUp;
     position = newPosition;
+
+    radius = sqrt(pow(position.x - look.x, 2) + pow(position.y - look.y, 2) + pow(position.z - look.z, 2));
+    beta = asin((position.y - look.y) / radius);
+    alpha = atan((position.x - look.x) / (position.z - look.z));
+    if (position.z - look.z < 0.0) { alpha += M_PI; }
 
     near = newNear;
     far = newFar;
@@ -58,8 +61,8 @@ void Camera::posInitialCamera() {
     currentType = FOLLOW;
 
     radius = 10.0;
-    alpha = 0;
-    beta = 0;
+    beta = 0.0;
+    alpha = M_PI / 5;
 
     look = Vector3(0.0, 0.0, 0.0);
     up = Vector3(0.0f, 1.0f, 0.0f);
@@ -94,6 +97,11 @@ void Camera::setup(Vector3 newLook, Vector3 newUp, Vector3 newPosition) {
     look = newLook;
     up = newUp;
     position = newPosition;
+
+    radius = sqrt(pow(position.x - look.x, 2) + pow(position.y - look.y, 2) + pow(position.z - look.z, 2));
+    beta = asin((position.y - look.y) / radius);
+    alpha = atan((position.x - look.x) / (position.z - look.z));
+    if (position.z - look.z < 0.0) { alpha += M_PI; }
 }
 
 void Camera::setNextTypeCamera() {
@@ -103,7 +111,6 @@ void Camera::setNextTypeCamera() {
             break;
         case FPS:
             currentType = FOLLOW;
-            // posInitialCamera();
             break;
         default:
             currentType = FOLLOW;
