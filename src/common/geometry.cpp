@@ -387,15 +387,15 @@ Model Model::generateCone(float radius, float height, int slices, int stacks) {
     return cone;
 }
 
-Model Model::generateTorus(float radius, float tubeRadius, int hSlices, int vSlices) {
+Model Model::generateTorus(float radius, float tubeRadius, int tSlices, int pSlices) {
     Model torus = Model();
 
     // Vertexes
-    for (int vs = 0; vs < vSlices; vs++) {
-        float alpha = vs * (2 * M_PI / vSlices);
+    for (int ps = 0; ps < pSlices; ps++) {
+        float alpha = ps * (2 * M_PI / pSlices);
         Vector3 tubeCenter = Vector3::fromSpherical(alpha, 0, radius);
-        for (int hs = 0; hs < hSlices; hs++) {
-            float beta = hs * (2*M_PI / hSlices);
+        for (int ts = 0; ts < tSlices; ts++) {
+            float beta = ts * (2*M_PI / tSlices);
             Vector3 vertex = Vector3::fromSpherical(alpha, beta, tubeRadius);
             vertex.applyVector(tubeCenter);
             torus.addVertex(vertex);
@@ -403,28 +403,28 @@ Model Model::generateTorus(float radius, float tubeRadius, int hSlices, int vSli
     }
 
     // Faces
-    for (int vs = 0; vs < vSlices; vs++) {
-        for (int hs = 0; hs < hSlices; hs++) {
+    for (int ps = 0; ps < pSlices; ps++) {
+        for (int ts = 0; ts < tSlices; ts++) {
             int v1, v2, v3, v4;
-            v1 = vs * hSlices + hs;
-            if (vs < vSlices - 1) {
-                v2 = v1 + hSlices;
+            v1 = ps * tSlices + ts;
+            if (ps < pSlices - 1) {
+                v2 = v1 + tSlices;
             }
             else {
-                v2 = hs;
+                v2 = ts;
             }
             
-            if (hs < hSlices - 1) {
+            if (ts < tSlices - 1) {
                 v3 = v1 + 1;
             }
             else {
-                v3 = vs * hSlices;
+                v3 = ps * tSlices;
             }
 
-            if (vs < vSlices - 1) {
-                v4 = v3 + hSlices;
+            if (ps < pSlices - 1) {
+                v4 = v3 + tSlices;
             }
-            else if (hs < hSlices - 1) {
+            else if (ts < tSlices - 1) {
                 v4 = v2 + 1;
             }
             else {

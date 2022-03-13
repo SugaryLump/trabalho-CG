@@ -18,8 +18,8 @@ int main(int argc, char *argv[]) {
     program.add_argument("parameters")
         .help(
             "Plane: [length] [subdivisions]\n\t\tBox: [length] [subdivisions]\n\t\tSphere: [radius] [slices] "
-            "[stacks]\n\t\tCone: [radius] [height] [slices] [stacks]\n\t\tTorus: [radius] [tube radius] [horizontal "
-            "slices] [vertical slices]")
+            "[stacks]\n\t\tCone: [radius] [height] [slices] [stacks]\n\t\tTorus: [radius] [tube radius] [toroidal "
+            "slices] [poloidal slices]")
         .remaining()
         .scan<'f', float>();
 
