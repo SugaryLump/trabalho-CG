@@ -202,6 +202,8 @@ void render(int argc, char **argv, Config config) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+    //glShadeModel(GL_FLAT);
 
     // enter GLUTs main cycle
     glutMainLoop();

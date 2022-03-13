@@ -15,6 +15,8 @@ class VBO {
    private:
     GLuint* vertexBufferIndex;
     GLuint* indexBufferIndex;
+    GLuint* colorBufferIndex;
+    
     unsigned int indexCount;
 
    public:
