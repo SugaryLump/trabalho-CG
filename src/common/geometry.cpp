@@ -1,6 +1,7 @@
 #include "common/geometry.hpp"
 #define _USE_MATH_DEFINES
 #include <math.h>
+
 #include <fstream>
 #include <iostream>
 #include <tuple>
@@ -394,7 +395,7 @@ Model Model::generateTorus(float radius, float tubeRadius, int tSlices, int pSli
         float alpha = ps * (2 * M_PI / pSlices);
         Vector3 tubeCenter = Vector3::fromSpherical(alpha, 0, radius);
         for (int ts = 0; ts < tSlices; ts++) {
-            float beta = ts * (2*M_PI / tSlices);
+            float beta = ts * (2 * M_PI / tSlices);
             Vector3 vertex = Vector3::fromSpherical(alpha, beta, tubeRadius);
             vertex.applyVector(tubeCenter);
             torus.addVertex(vertex);
@@ -408,25 +409,21 @@ Model Model::generateTorus(float radius, float tubeRadius, int tSlices, int pSli
             v1 = ps * tSlices + ts;
             if (ps < pSlices - 1) {
                 v2 = v1 + tSlices;
-            }
-            else {
+            } else {
                 v2 = ts;
             }
-            
+
             if (ts < tSlices - 1) {
                 v3 = v1 + 1;
-            }
-            else {
+            } else {
                 v3 = ps * tSlices;
             }
 
             if (ps < pSlices - 1) {
                 v4 = v3 + tSlices;
-            }
-            else if (ts < tSlices - 1) {
+            } else if (ts < tSlices - 1) {
                 v4 = v2 + 1;
-            }
-            else {
+            } else {
                 v4 = 0;
             }
 

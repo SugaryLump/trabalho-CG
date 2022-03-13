@@ -5,39 +5,39 @@
 #include <vector>
 
 class Vector3 {
-    public:
-        float x;
-        float y;
-        float z;
+   public:
+    float x;
+    float y;
+    float z;
 
-        Vector3() = default;
-        Vector3(float newx, float newy, float newz);
-        Vector3(float newx, float newz);
+    Vector3() = default;
+    Vector3(float newx, float newy, float newz);
+    Vector3(float newx, float newz);
 
-        static Vector3 fromSpherical(float alpha, float beta, float radius);
-        void applyVector(Vector3 vector);
+    static Vector3 fromSpherical(float alpha, float beta, float radius);
+    void applyVector(Vector3 vector);
 };
 
 class Spherical {
-    public:
-        float radius;
-        float alpha;
-        float beta;
+   public:
+    float radius;
+    float alpha;
+    float beta;
 
-        Spherical() = default;
-        Spherical(float radius, float alpha, float beta);
-        Spherical(float radius, float alpha);
-        Vector3 toVector3(float centerX, float centerY, float centerZ);
+    Spherical() = default;
+    Spherical(float radius, float alpha, float beta);
+    Spherical(float radius, float alpha);
+    Vector3 toVector3(float centerX, float centerY, float centerZ);
 };
 
 class Triangle {
-    public:
-        Vector3 p1;
-        Vector3 p2;
-        Vector3 p3;
+   public:
+    Vector3 p1;
+    Vector3 p2;
+    Vector3 p3;
 
-        Triangle() = default;
-        Triangle(Vector3 v1, Vector3 v2, Vector3 v3);
+    Triangle() = default;
+    Triangle(Vector3 v1, Vector3 v2, Vector3 v3);
 };
 
 class Model {

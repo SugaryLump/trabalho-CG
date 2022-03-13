@@ -1,11 +1,11 @@
 #include <fmt/core.h>
 
+#include <argparse/argparse.hpp>
 #include <iostream>
 
 #include "engine/config.hpp"
 #include "engine/render.hpp"
 #include "engine/xmlParser.hpp"
-#include <argparse/argparse.hpp>
 
 using namespace std;
 
