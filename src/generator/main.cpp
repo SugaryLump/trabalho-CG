@@ -19,9 +19,9 @@ int main(int argc, char *argv[]) {
     program.add_argument("filename")
         .help("The file path to write to.");
     program.add_argument("shape")
-        .help("[plane|box|sphere|cone]");
+        .help("[plane|box|sphere|cone|torus]");
     program.add_argument("parameters")
-        .help("Plane: [length] [subdivisions]\n\t\tBox: [length] [subdivisions]\n\t\tSphere: [radius] [slices] [stacks]\n\t\tCone: [radius] [height] [slices] [stacks]")
+        .help("Plane: [length] [subdivisions]\n\t\tBox: [length] [subdivisions]\n\t\tSphere: [radius] [slices] [stacks]\n\t\tCone: [radius] [height] [slices] [stacks]\n\t\tTorus: [radius] [tube radius] [horizontal slices] [vertical slices]")
         .remaining()
         .scan<'f',float>();
     
@@ -76,6 +76,16 @@ int main(int argc, char *argv[]) {
         }
         else {
             model = Model::generateCone(params[0], params[1], (int)params[2], (int)params[3]);
+        }
+    }
+
+    else if (!shape.compare("torus")) {
+        if (params.size() != 4) {
+            std::cerr << program;
+            std::exit(1);
+        }
+        else {
+            model = Model::generateTorus(params[0], params[1], (int)params[2], (int)params[3]);
         }
     }
 

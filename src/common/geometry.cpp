@@ -9,7 +9,7 @@
 
 using namespace std;
 
-//Vector3
+// Vector3
 Vector3::Vector3(float x_, float y_, float z_) {
     x = x_;
     y = y_;
@@ -35,11 +35,7 @@ void Vector3::applyVector(Vector3 vector) {
     z += vector.z;
 }
 
-
-
-
-
-//Spherical
+// Spherical
 Spherical::Spherical(float radius_, float alpha_, float beta_) {
     radius = radius_;
     alpha = alpha_;
@@ -59,22 +55,14 @@ Vector3 Spherical::toVector3(float centerX, float centerY, float centerZ) {
     return Vector3(x, y, z);
 }
 
-
-
-
-
-//Triangle
+// Triangle
 Triangle::Triangle(Vector3 v1, Vector3 v2, Vector3 v3) {
     p1 = v1;
     p2 = v2;
     p3 = v3;
 }
 
-
-
-
-
-//Model
+// Model
 Model::Model(const string& path) {
     string line;
     ifstream file(path);
@@ -83,7 +71,8 @@ Model::Model(const string& path) {
         switch (line[0]) {
             case '\n':
                 break;
-            case '#': case '\000':
+            case '#':
+            case '\000':
                 break;
             case 'v': {
                 float n1, n2, n3;
@@ -117,7 +106,7 @@ Model::Model(const string& path) {
     file.close();
 }
 
-void Model::toFile(std::string const &path) {
+void Model::toFile(std::string const& path) {
     ofstream stream;
     stream.open(path);
     stream << "# Vertexes\n";
@@ -292,49 +281,47 @@ int calcBoxVertexIndex(int x, int y, int z, int subdivisions) {
 // stacks must be bigger than 1
 Model Model::generateSphere(float radius, int slices, int stacks) {
     Model sphere = Model();
-	sphere.addVertex(Vector3(0, -radius, 0));
-	sphere.addVertex(Vector3(0, radius, 0));
+    sphere.addVertex(Vector3(0, -radius, 0));
+    sphere.addVertex(Vector3(0, radius, 0));
 
-	for (int st = 0; st < stacks - 1; st++) {
-		for (int sl = 0; sl < slices; sl++) {
+    for (int st = 0; st < stacks - 1; st++) {
+        for (int sl = 0; sl < slices; sl++) {
             float alpha = sl * 2 * M_PI / slices;
             float beta = -M_PI_2 + (st + 1) * M_PI / stacks;
-			sphere.addVertex(Vector3::fromSpherical(alpha, beta, radius));
-		}
-	}
+            sphere.addVertex(Vector3::fromSpherical(alpha, beta, radius));
+        }
+    }
 
-	//Bottom and top stacks;
-	for (int sl = 0; sl < slices; sl++) {
-		if (sl < slices - 1) {
-			sphere.addFace(0, sl + 3, sl + 2);
-			sphere.addFace(1, (stacks - 2) * slices + 2 + sl, (stacks - 2) * slices + 3 + sl);
-		}
-		else {
-			sphere.addFace(0, 2, sl + 2);
-			sphere.addFace(1, (stacks - 2) * slices + 2 + sl, (stacks - 2) * slices + 2);
-		}
-	}
+    // Bottom and top stacks;
+    for (int sl = 0; sl < slices; sl++) {
+        if (sl < slices - 1) {
+            sphere.addFace(0, sl + 3, sl + 2);
+            sphere.addFace(1, (stacks - 2) * slices + 2 + sl, (stacks - 2) * slices + 3 + sl);
+        } else {
+            sphere.addFace(0, 2, sl + 2);
+            sphere.addFace(1, (stacks - 2) * slices + 2 + sl, (stacks - 2) * slices + 2);
+        }
+    }
 
-	//Middle stacks;
-	for (int st = 0; st < stacks - 2; st++) {
-		for (int sl = 0; sl < slices; sl++) {
-			int v1,v2,v3,v4;
-			if (sl < slices - 1) {
-				v1 = st * slices + 2 + sl;
-				v2 = v1 + 1;
-				v3 = v1 + slices;
-				v4 = v3 + 1;
-			}
-			else {
-				v1 = st * slices + 2 + sl;
-				v2 = st * slices + 2;
-				v3 = v1 + slices;
-				v4 = v2 + slices;
-			}
-			sphere.addFace(v1, v2, v4);
-			sphere.addFace(v1, v4, v3);
-		}
-	}
+    // Middle stacks;
+    for (int st = 0; st < stacks - 2; st++) {
+        for (int sl = 0; sl < slices; sl++) {
+            int v1, v2, v3, v4;
+            if (sl < slices - 1) {
+                v1 = st * slices + 2 + sl;
+                v2 = v1 + 1;
+                v3 = v1 + slices;
+                v4 = v3 + 1;
+            } else {
+                v1 = st * slices + 2 + sl;
+                v2 = st * slices + 2;
+                v3 = v1 + slices;
+                v4 = v2 + slices;
+            }
+            sphere.addFace(v1, v2, v4);
+            sphere.addFace(v1, v4, v3);
+        }
+    }
 
     return sphere;
 }
@@ -351,7 +338,7 @@ Model Model::generateCone(float radius, float height, int slices, int stacks) {
         float alpha = 0;
         for (int sl = 0; sl < slices; sl++) {
             Vector3 vertex = Vector3::fromSpherical(alpha, 0, radius - (radius / stacks * st));
-            vertex.applyVector(Vector3(0, (float)height / stacks * st, 0));
+            vertex.applyVector(Vector3(0, (float) height / stacks * st, 0));
             cone.addVertex(vertex);
             alpha += 2 * M_PI / slices;
         }
@@ -398,4 +385,55 @@ Model Model::generateCone(float radius, float height, int slices, int stacks) {
     }
 
     return cone;
+}
+
+Model Model::generateTorus(float radius, float tubeRadius, int hSlices, int vSlices) {
+    Model torus = Model();
+
+    // Vertexes
+    for (int vs = 0; vs < vSlices; vs++) {
+        float alpha = vs * (2 * M_PI / vSlices);
+        Vector3 tubeCenter = Vector3::fromSpherical(alpha, 0, radius);
+        for (int hs = 0; hs < hSlices; hs++) {
+            float beta = hs * (2*M_PI / hSlices);
+            Vector3 vertex = Vector3::fromSpherical(alpha, beta, tubeRadius);
+            vertex.applyVector(tubeCenter);
+            torus.addVertex(vertex);
+        }
+    }
+
+    // Faces
+    for (int vs = 0; vs < vSlices; vs++) {
+        for (int hs = 0; hs < hSlices; hs++) {
+            int v1, v2, v3, v4;
+            v1 = vs * hSlices + hs;
+            if (vs < vSlices - 1) {
+                v2 = v1 + hSlices;
+            }
+            else {
+                v2 = hs;
+            }
+            
+            if (hs < hSlices - 1) {
+                v3 = v1 + 1;
+            }
+            else {
+                v3 = vs * hSlices;
+            }
+
+            if (vs < vSlices - 1) {
+                v4 = v3 + hSlices;
+            }
+            else if (hs < hSlices - 1) {
+                v4 = v2 + 1;
+            }
+            else {
+                v4 = 0;
+            }
+
+            torus.addFace(v1, v4, v3);
+            torus.addFace(v1, v2, v4);
+        }
+    }
+    return torus;
 }

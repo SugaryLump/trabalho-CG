@@ -62,6 +62,7 @@ class Model {
     static Model generateBox(float length, int subdivisions);
     static Model generateSphere(float radius, int slices, int stacks);
     static Model generateCone(float radius, float height, int slices, int stacks);
+    static Model generateTorus(float radius, float tubeRadius, int hSlices, int vSlices);
 };
 
 int calcBoxInnerVertexes(int x, int y, int z, int subdivisions);
