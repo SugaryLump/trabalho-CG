@@ -20,3 +20,6 @@ As seguintes bibliotecas precisam de estar instaladas no sistema:
 Para além dessas, ao clonar recursivamente são instaladas as seguintes bibliotecas:
  - fmtlib
  - pugixml
+ 
+ ## Instruções de uso
+ Para obter as instruções de uso do gerador e do _engine_ utiliza-se a opção ``--help``.
