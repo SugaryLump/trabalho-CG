@@ -46,7 +46,8 @@ void changeSize(int w, int h) {
     // Load the identity matrix
     glLoadIdentity();
     // set the perspective
-    gluPerspective(45.0f, ratio, 1.0f, 1000.0f);
+    // gluPerspective(45.0f, ratio, 1.0f, 1000.0f);
+    gluPerspective(camera->getFov(), ratio, camera->getNear(), camera->getFar());
     // return to the model view matrix mode
     glMatrixMode(GL_MODELVIEW);
     // set the viewport to be the entire window
