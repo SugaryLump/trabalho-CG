@@ -23,4 +23,16 @@ Para além dessas, ao clonar recursivamente são instaladas as seguintes bibliot
  - argparse
  
  ## Instruções de uso
- Para obter as instruções de uso do gerador e do _engine_ utiliza-se a opção ``--help``.
+ Para obter as instruções de uso do comando do gerador e do _engine_ utiliza-se a opção ``--help``.
+ 
+ ## Controlos do engine
+ 
+  - F: Mudar entre modo explorador e FPS
+  - Setas: Mover câmara em modo explorador
+  - F1 e F2: Alterar raio da câmara em modo explorador
+  - WASD: Deslocar câmara em modo FPS
+  - Espaço: Subir câmara em modo FPS
+  - C: Descer câmara em modo FPS
+  - Rato: Rodar câmara em modo FPS
+  - .: Ligar/Desligar renderização de eixos
+  - ,: Mudar modo de renderização de VBOs
