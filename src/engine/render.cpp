@@ -1,7 +1,6 @@
 #include "engine/render.hpp"
-
 #include <cstdlib>
-
+#include "engine/vbo.hpp"
 #include "common/geometry.hpp"
 #include "engine/camera.hpp"
 #include "engine/input.hpp"
@@ -14,18 +13,15 @@
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <GL/glew.h>
 #include <GL/glut.h>
 #endif
 
 namespace Render {
 
 static Camera camera;
-static std::vector<Model> models;
-// FIXME delete
-// static Model *model;
 static InputState *input;
+static VBOController *vboController;
 
 static float SCALE = 1;
 static bool SHOW_AXIS = false;
@@ -96,25 +92,7 @@ void renderScene(void) {
 
     glPolygonMode(GL_FRONT_AND_BACK, line);
 
-    glBegin(GL_TRIANGLES);
-    for (Model model : models) {
-        for (int f = 0; f < (int) model.indices.size(); f++) {
-            if (f % 3 == 0) {
-                glColor3f(0.0, 0.185, 0.252);
-                // glColor3f(0.2f, 0.44f, 0.54f);
-            } else if (f % 2 == 0) {
-                glColor3f(0.183, 0.26, 0.231);
-            } else {
-                glColor3f(0.126, 0.14, 0.189);
-            }
-            float x = model.vertices[model.indices[f] * 3];
-            float y = model.vertices[model.indices[f] * 3 + 1];
-            float z = model.vertices[model.indices[f] * 3 + 2];
-            glVertex3f(x, y, z);
-        }
-    }
-
-    glEnd();
+    vboController->drawVBOs();
 
     // End of frame
     glutSwapBuffers();
@@ -193,8 +171,6 @@ void update() {
 void render(int argc, char **argv, Config config) {
     camera = config.camera;
     input = new InputState();
-    // models.push_back(Model::generateCone(2, 5, 100, 100));
-    models = config.models;
 
     // put GLUT init here
     glutInit(&argc, argv);
@@ -203,13 +179,6 @@ void render(int argc, char **argv, Config config) {
     glutInitWindowSize(800, 800);
     glutCreateWindow("CG-Engine");
     timebase = glutGet(GLUT_ELAPSED_TIME);
-
-    // some OpenGL settings
-    glPolygonMode(GL_FRONT, GL_FILL);
-    glEnable(GL_BLEND);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    // glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     // put callback registry here
     glutDisplayFunc(renderScene);
@@ -222,6 +191,17 @@ void render(int argc, char **argv, Config config) {
     glutKeyboardUpFunc(keyReleaseHandler);
     glutSpecialUpFunc(specialKeyReleaseHandler);
     glutPassiveMotionFunc(passiveMouseHandler);
+
+    // put GLEW and VBO init here
+    glewInit();
+    vboController = new VBOController(config.models);
+
+    // some OpenGL settings
+    glPolygonMode(GL_FRONT, GL_FILL);
+    glEnable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glEnableClientState(GL_VERTEX_ARRAY);
 
     // enter GLUTs main cycle
     glutMainLoop();

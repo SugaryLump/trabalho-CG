@@ -70,7 +70,7 @@ Config parser(char* filename) {
         } else if (!name.compare("group")) {
             try {
                 c.models = parseModels(node);
-            } catch (exception e) { std::cout << e.what() << "\n"; }
+            } catch (exception const& e) { std::cout << e.what() << "\n"; }
             // std::cout << "Li X modelos :: " << c.models.size() << endl;
             // std::cout << c.models[0].vertices.size() << "\n";
             // std::cout << c.models[0].indices.size() << "\n";

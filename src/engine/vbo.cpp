@@ -1,29 +1,51 @@
-#include <cstdlib>
 #include "engine/vbo.hpp"
-#include "common/geometry.hpp"
+
+#include <cstdlib>
 #include <vector>
 
+#include "common/geometry.hpp"
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
+#include <GL/glew.h>
+#include <GL/glut.h>
+#endif
+
+VBOController::VBOController() {}
+
 VBOController::VBOController(std::vector<Model> models) {
-    // Load the VBOController's vertices and indices arrays
-    int points = 0;
-    for (Model model : models) {
-        for (float vertexes : model.vertices) {
-            // buffers->push_back(vertexes);
-        }
-        for (unsigned int elem : model.indices) {
-            // vertices->push_back(points +  elem);
-        }
-        // points = buffers->size() / 3;
-    }
+    for (Model model : models) { vbos.push_back(VBO(model)); }
 }
 
-void VBOController::drawModels() {
-    // Draw the VBOController's vertex and index arrays
-    // glBindBuffer(GL_ARRAY_BUFFER,buffers);
-    // glVertexPointer(3,GL_FLOAT,0,0);
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertices);
-    // glDrawElements(GL_TRIANGLES,
-    // vertices.size(), // número de índices a desenhar
-    // GL_UNSIGNED_INT, // tipo de dados dos índices
-    // 0);// parâmetro não utilizado
+void VBOController::drawVBOs() {
+    for (VBO vbo : vbos) { vbo.draw(); }
+}
+
+void VBOController::drawVBO(int index) {
+    vbos[index].draw();
+}
+
+VBO::VBO() {}
+
+VBO::VBO(Model model) {
+    vertexBufferIndex = (GLuint*)malloc(sizeof(GLuint));
+    indexBufferIndex = (GLuint*)malloc(sizeof(GLuint));
+
+    glGenBuffers(1, vertexBufferIndex);
+    glBindBuffer(GL_ARRAY_BUFFER, *vertexBufferIndex);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * model.vertices.size(), model.vertices.data(), GL_STATIC_DRAW);
+
+    glGenBuffers(1, indexBufferIndex);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *indexBufferIndex);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * model.indices.size(), model.indices.data(), GL_STATIC_DRAW);
+
+    indexCount = model.indices.size();
+}
+
+void VBO::draw() {
+    glBindBuffer(GL_ARRAY_BUFFER, *vertexBufferIndex);
+    glVertexPointer(3, GL_FLOAT, 0, 0);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *indexBufferIndex);
+    glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
 }

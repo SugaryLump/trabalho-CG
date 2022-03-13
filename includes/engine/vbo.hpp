@@ -1,23 +1,37 @@
 #pragma once
 
+#include <cstdlib>
+#include <memory>
+#include <vector>
+#include "common/geometry.hpp"
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
+#include <GL/glew.h>
 #include <GL/glut.h>
 #endif
 
-#include <vector>
+class VBO {
+   private:
+    GLuint* vertexBufferIndex;
+    GLuint* indexBufferIndex;
+    unsigned int indexCount;
 
-#include "common/geometry.hpp"
+   public:
+    VBO();
+    VBO(Model model);
+
+    void draw();
+};
 
 class VBOController {
    private:
-    GLuint* buffers;
-    GLuint* vertices;
+    std::vector<VBO> vbos;
 
    public:
-    VBOController() = default;
+    VBOController();
     explicit VBOController(std::vector<Model> models);
 
-    void drawModels();
+    void drawVBOs();
+    void drawVBO(int index);
 };
