@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <memory>
 #include <vector>
+
 #include "common/geometry.hpp"
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -16,12 +17,12 @@ class VBO {
     GLuint* vertexBufferIndex;
     GLuint* indexBufferIndex;
     GLuint* colorBufferIndex;
-    
+
     unsigned int indexCount;
 
    public:
     VBO();
-    VBO(Model model);
+    explicit VBO(Model model);
 
     void draw();
 };
@@ -31,8 +32,8 @@ class VBOController {
     std::vector<VBO> vbos;
 
    public:
-    VBOController();
-    explicit VBOController(std::vector<Model> models);
+    VBOController() = default;
+    explicit VBOController(const std::vector<Model>& models);
 
     void drawVBOs();
     void drawVBO(int index);

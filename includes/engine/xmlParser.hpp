@@ -1,11 +1,10 @@
-#ifndef XMLPARSER_HPP_
-#define XMLPARSER_HPP_
+#pragma once
+
+#include <optional>
 
 #include "engine/camera.hpp"
 #include "engine/config.hpp"
 
 namespace Parser {
-Config parser(char* filename);
+std::optional<Config> parser(const std::string& filename) noexcept;
 }
-
-#endif  // XMLPARSER_HPP_

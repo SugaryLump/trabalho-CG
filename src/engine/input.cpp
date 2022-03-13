@@ -3,23 +3,6 @@
 #define KEYS_COUNT 256
 #define SPECIAL_KEYS_COUNT 112
 
-InputState::InputState() {
-    keysState = new bool[KEYS_COUNT];
-    prevKeysState = new bool[KEYS_COUNT];
-    specialKeysState = new bool[SPECIAL_KEYS_COUNT];
-    prevSpecialKeysState = new bool[SPECIAL_KEYS_COUNT];
-    for(int k = 0; k < KEYS_COUNT; k++) {
-        keysState[k] = 0;
-        prevKeysState[k] = 0;
-    }
-    for (int k = 0; k < SPECIAL_KEYS_COUNT; k++) {
-        specialKeysState[k] = 0;
-        prevSpecialKeysState[k] = 0;
-    }
-    mouseDeltaX = 0;
-    mouseDeltaY = 0;
-}
-
 bool InputState::keyTapped(int key) {
     return (keysState[key] && !prevKeysState[key]);
 }
@@ -40,6 +23,10 @@ bool InputState::specialKeyHeld(int specialKey) {
     return specialKeysState[specialKey];
 }
 
+bool InputState::specialKeyReleased(int specialKey) {
+    return (!specialKeysState[specialKey] && prevSpecialKeysState[specialKey]);
+}
+
 int InputState::keyAxisDirection(int keyNeg, int keyPos) {
     return keysState[keyPos] - keysState[keyNeg];
 }
@@ -48,11 +35,11 @@ int InputState::specialKeyAxisDirection(int keyNeg, int keyPos) {
     return specialKeysState[keyPos] - specialKeysState[keyNeg];
 }
 
-int InputState::getMouseDeltaX() {
+int InputState::getMouseDeltaX() const {
     return mouseDeltaX;
 }
 
-int InputState::getMouseDeltaY() {
+int InputState::getMouseDeltaY() const {
     return mouseDeltaY;
 }
 

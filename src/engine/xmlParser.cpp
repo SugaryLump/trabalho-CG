@@ -1,13 +1,16 @@
 #include "engine/xmlParser.hpp"
 
-#include <iostream>
+#include <fmt/core.h>
+
+#include <memory>
+#include <optional>
 #include <pugixml.hpp>
 
 using namespace std;
 
 namespace Parser {
 
-Camera parseCamera(pugi::xml_node node) {
+std::unique_ptr<Camera> parseCamera(pugi::xml_node node) noexcept {
     pugi::xml_node pos = node.child("position");
 
     float x = stof(pos.attribute("x").value());
@@ -32,45 +35,38 @@ Camera parseCamera(pugi::xml_node node) {
     float far = stof(pos.attribute("far").value());
     float fov = stof(pos.attribute("fov").value());
 
-    Camera c = Camera(look, up, position, near, far, fov);
+    auto c = std::make_unique<Camera>(look, up, position, near, far, fov);
     return c;
 }
 
-std::vector<Model> parseModels(pugi::xml_node node) {
+std::vector<Model> parseModels(pugi::xml_node node) noexcept {
     std::vector<Model> models;
-    for (pugi::xml_node node : node.child("models")) {
-        string name = node.name();
-        if (!name.compare("model")) {
-            const char* filename = node.attribute("file").value();
-            models.push_back(Model(filename));
+    for (pugi::xml_node models_node : node.child("models")) {
+        string name = models_node.name();
+        if (name == "model") {
+            const char* filename = models_node.attribute("file").value();
+            models.emplace_back(filename);
         }
     }
     return models;
 }
 
-Config parser(char* filename) {
+std::optional<Config> parser(const std::string& filename) noexcept {
     pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_file(filename);
+    pugi::xml_parse_result result = doc.load_file(filename.c_str());
+
     if (!result) {
-        std::cout << "erro: " << result << "\n";
-        // FIXME CHANGE THIS
-        throw "error";
-        // return -1;
+        fmt::print(stderr, "error: {}\n", result);
+        return {};
     }
-    // std::cout << "Read config.xml\n ";
 
     Config c = Config();
-    // std::cout << doc.child("world").child("group") << std::endl;
-    // Camera c;
     for (pugi::xml_node node : doc.child("world")) {
         string name = node.name();
-        if (!name.compare("camera")) {
-            // FIXME dar free da camera default q ja tinha
+        if (name == "camera") {
             c.camera = parseCamera(node);
-        } else if (!name.compare("group")) {
-            try {
-                c.models = parseModels(node);
-            } catch (exception const& e) { std::cout << e.what() << "\n"; }
+        } else if (name == "group") {
+            c.models = parseModels(node);
             // std::cout << "Li X modelos :: " << c.models.size() << endl;
             // std::cout << c.models[0].vertices.size() << "\n";
             // std::cout << c.models[0].indices.size() << "\n";

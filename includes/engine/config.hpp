@@ -1,14 +1,13 @@
-#ifndef CONFIG_HPP_
-#define CONFIG_HPP_
+#pragma once
+
+#include <memory>
 
 #include "common/geometry.hpp"
 #include "engine/camera.hpp"
 
 struct Config {
-    Camera camera;
+    std::unique_ptr<Camera> camera;
     std::vector<Model> models;
 
     Config();
 };
-
-#endif  // Config_HPP_

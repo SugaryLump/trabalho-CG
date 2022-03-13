@@ -112,9 +112,6 @@ void Camera::setNextTypeCamera() {
         case FPS:
             currentType = FOLLOW;
             break;
-        default:
-            currentType = FOLLOW;
-            break;
     }
 }
 

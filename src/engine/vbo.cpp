@@ -11,10 +11,8 @@
 #include <GL/glut.h>
 #endif
 
-VBOController::VBOController() {}
-
-VBOController::VBOController(std::vector<Model> models) {
-    for (Model model : models) { vbos.push_back(VBO(model)); }
+VBOController::VBOController(const std::vector<Model>& models) {
+    for (const Model& model : models) { vbos.emplace_back(model); }
 }
 
 void VBOController::drawVBOs() {
@@ -28,9 +26,9 @@ void VBOController::drawVBO(int index) {
 VBO::VBO() {}
 
 VBO::VBO(Model model) {
-    colorBufferIndex = (GLuint*)malloc(sizeof(GLuint));
-    vertexBufferIndex = (GLuint*)malloc(sizeof(GLuint));
-    indexBufferIndex = (GLuint*)malloc(sizeof(GLuint));
+    colorBufferIndex = (GLuint*) malloc(sizeof(GLuint));
+    vertexBufferIndex = (GLuint*) malloc(sizeof(GLuint));
+    indexBufferIndex = (GLuint*) malloc(sizeof(GLuint));
 
     // Generate colors
     std::vector<float> colors;
@@ -38,23 +36,18 @@ VBO::VBO(Model model) {
     float g = 0.3;
     float b = 1;
     int colorSectionSize = model.vertices.size() / 18;
-    for (int c = 0; c < (int)model.vertices.size() / 3; c++) {
+    for (int c = 0; c < (int) model.vertices.size() / 3; c++) {
         if (c < colorSectionSize) {
             r += 0.7 / colorSectionSize;
-        }
-        else if (c < 2 * colorSectionSize) {
+        } else if (c < 2 * colorSectionSize) {
             b -= 0.7 / colorSectionSize;
-        }
-        else if (c < 3 * colorSectionSize) {
+        } else if (c < 3 * colorSectionSize) {
             g += 0.7 / colorSectionSize;
-        }
-        else if (c < 4 * colorSectionSize) {
+        } else if (c < 4 * colorSectionSize) {
             r -= 0.7 / colorSectionSize;
-        }
-        else if (c < 5 * colorSectionSize) {
+        } else if (c < 5 * colorSectionSize) {
             b += 0.7 / colorSectionSize;
-        }
-        else {
+        } else {
             g -= 0.7 / colorSectionSize;
         }
         colors.push_back(r);
@@ -72,7 +65,8 @@ VBO::VBO(Model model) {
 
     glGenBuffers(1, indexBufferIndex);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *indexBufferIndex);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * model.indices.size(), model.indices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * model.indices.size(), model.indices.data(),
+                 GL_STATIC_DRAW);
 
     indexCount = model.indices.size();
 }

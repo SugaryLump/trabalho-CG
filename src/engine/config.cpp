@@ -1,5 +1,5 @@
 #include "engine/config.hpp"
 
 Config::Config() {
-    camera = Camera();
+    camera = std::make_unique<Camera>();
 }

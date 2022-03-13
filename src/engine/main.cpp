@@ -5,10 +5,11 @@
 #include "engine/config.hpp"
 #include "engine/render.hpp"
 #include "engine/xmlParser.hpp"
+#include <argparse/argparse.hpp>
 
 using namespace std;
 
-static char *PROGRAM_NAME;
+static const char *PROGRAM_NAME;
 void printHelpPage() {
     fmt::print(stderr,
                "HELP PAGE:\n"
@@ -19,20 +20,26 @@ void printHelpPage() {
 }
 
 int main(int argc, char *argv[]) {
-    PROGRAM_NAME = argv[0];
+    argparse::ArgumentParser program(argv[0]);
+    program.add_argument("config").help("XML scene config file");
 
-    if (argc < 2 || string(argv[1]) == "-h" || string(argv[1]) == "-help") {
-        printHelpPage();
-        return 1;
+    try {
+        program.parse_args(argc, argv);
+    } catch (const std::runtime_error &err) {
+        std::cerr << program;
+        std::exit(1);
     }
 
-    char *filename = argv[1];
+    auto filename = program.get<std::string>("config");
 
     // chamar o parser
-    Config config = Parser::parser(filename);
-    // Config config;
-
-    Render::render(argc, argv, config);
+    optional<Config> config = Parser::parser(filename);
+    if (config.has_value()) {
+        Render::render(argc, argv, config.value());
+    } else {
+        fmt::print(stderr, "Error parsing config\n");
+        return 1;
+    }
 
     return 0;
 }

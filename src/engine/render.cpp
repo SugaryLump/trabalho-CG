@@ -1,9 +1,11 @@
 #include "engine/render.hpp"
+
 #include <cstdlib>
-#include "engine/vbo.hpp"
+
 #include "common/geometry.hpp"
 #include "engine/camera.hpp"
 #include "engine/input.hpp"
+#include "engine/vbo.hpp"
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <stdio.h>
@@ -19,9 +21,9 @@
 
 namespace Render {
 
-static Camera camera;
-static InputState *input;
-static VBOController *vboController;
+static std::unique_ptr<Camera> camera;
+static std::unique_ptr<InputState> input;
+static std::unique_ptr<VBOController> vboController;
 
 static float SCALE = 1;
 static bool SHOW_AXIS = false;
@@ -51,7 +53,7 @@ void changeSize(int w, int h) {
     glViewport(0, 0, w, h);
 }
 
-void renderScene(void) {
+void renderScene() {
     // clear buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // set camera
@@ -67,8 +69,8 @@ void renderScene(void) {
     //           << camera.up.y << "\n"
     //           << camera.up.z << "\n";
 
-    gluLookAt(camera.position.x, camera.position.y, camera.position.z, camera.look.x, camera.look.y, camera.look.z,
-              camera.up.x, camera.up.y, camera.up.z);
+    gluLookAt(camera->position.x, camera->position.y, camera->position.z, camera->look.x, camera->look.y,
+              camera->look.z, camera->up.x, camera->up.y, camera->up.z);
 
     if (SHOW_AXIS) {
         // Axis
@@ -115,7 +117,7 @@ void specialKeyReleaseHandler(int key, int x, int y) {
 }
 
 void passiveMouseHandler(int x, int y) {
-    if (camera.currentType == FPS) {
+    if (camera->currentType == FPS) {
         if (!mouseWarping) {
             input->updateMouseDelta(x, y, windowWidth / 2, windowHeight / 2);
             mouseWarping = true;
@@ -155,8 +157,8 @@ void update() {
     if (input->keyTapped('q')) { exit(0); }
 
     // Updates
-    camera.update(input, rateModifier);
-    if (camera.currentType == FPS) {
+    camera->update(input.get(), rateModifier);
+    if (camera->currentType == FPS) {
         glutSetCursor(GLUT_CURSOR_NONE);
     } else {
         glutSetCursor(GLUT_CURSOR_INHERIT);
@@ -168,9 +170,9 @@ void update() {
     renderScene();
 }
 
-void render(int argc, char **argv, Config config) {
-    camera = config.camera;
-    input = new InputState();
+void render(int argc, char **argv, Config &config) {
+    camera = std::move(config.camera);
+    input = std::make_unique<InputState>();
 
     // put GLUT init here
     glutInit(&argc, argv);
@@ -194,7 +196,7 @@ void render(int argc, char **argv, Config config) {
 
     // put GLEW and VBO init here
     glewInit();
-    vboController = new VBOController(config.models);
+    vboController = std::make_unique<VBOController>(config.models);
 
     // some OpenGL settings
     glPolygonMode(GL_FRONT, GL_FILL);
@@ -203,7 +205,7 @@ void render(int argc, char **argv, Config config) {
     glEnable(GL_CULL_FACE);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
-    //glShadeModel(GL_FLAT);
+    // glShadeModel(GL_FLAT);
 
     // enter GLUTs main cycle
     glutMainLoop();
