@@ -1,7 +1,6 @@
 #include "common/geometry.hpp"
 #define _USE_MATH_DEFINES
-#include <tgmath.h>
-
+#include <math.h>
 #include <fstream>
 #include <iostream>
 #include <tuple>
