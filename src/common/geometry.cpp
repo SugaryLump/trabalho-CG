@@ -35,6 +35,19 @@ void Vector3::applyVector(Vector3 vector) {
     z += vector.z;
 }
 
+//Transform
+Transform::Transform(TransformType type_, Vector3 vector_) {
+    type = type_;
+    vector = vector_;
+    angle = 0;
+}
+
+Transform::Transform(TransformType type_, Vector3 vector_, float angle_) {
+    type = type_;
+    vector = vector_;
+    angle = angle_;
+}
+
 // Spherical
 Spherical::Spherical(float radius_, float alpha_, float beta_) {
     radius = radius_;
@@ -432,4 +445,13 @@ Model Model::generateTorus(float radius, float tubeRadius, int tSlices, int pSli
         }
     }
     return torus;
+}
+
+ModelGroup::ModelGroup(std::vector<Model> models, std::vector<Transform> transforms) {
+    rootModels = models;
+    transformations = transforms;
+}
+
+void ModelGroup::addChildGroup(ModelGroup childGroup) {
+    childModels.push_back(childGroup);
 }

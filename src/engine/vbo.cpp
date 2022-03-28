@@ -11,18 +11,6 @@
 #include <GL/glut.h>
 #endif
 
-VBOController::VBOController(const std::vector<Model>& models) {
-    for (const Model& model : models) { vbos.emplace_back(model); }
-}
-
-void VBOController::drawVBOs() {
-    for (VBO vbo : vbos) { vbo.draw(); }
-}
-
-void VBOController::drawVBO(int index) {
-    vbos[index].draw();
-}
-
 VBO::VBO() {}
 
 VBO::VBO(Model model) {
@@ -80,4 +68,54 @@ void VBO::draw() {
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *indexBufferIndex);
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+}
+
+VBOGroup::VBOGroup(ModelGroup modelGroup) {
+    transformations = modelGroup.transformations;
+    for (Model model : modelGroup.rootModels) {
+        rootVBOs.emplace_back(model);
+    }
+    for (ModelGroup childGroup : modelGroup.childModels) {
+        childVBOs.emplace_back(childGroup);
+    }
+}
+
+void VBOGroup::draw() {
+    glPushMatrix();
+
+    for (Transform transform : transformations) {
+        switch(transform.type) {
+            case Transform::TRANSLATE:
+                glTranslatef(transform.vector.x, transform.vector.y, transform.vector.z);
+                break;
+            case Transform::SCALE:
+                glScalef(transform.vector.x, transform.vector.y, transform.vector.z);
+                break;
+            case Transform::ROTATE:
+                glRotatef(transform.angle, transform.vector.x, transform.vector.y, transform.vector.z);
+                break;
+        }
+    }
+
+    for (VBO vbo : rootVBOs) {
+        vbo.draw();
+    }
+    
+    for (VBOGroup childGroup : childVBOs) {
+        childGroup.draw();
+    }
+
+    glPopMatrix();
+}
+
+VBOController::VBOController(const std::vector<ModelGroup>& models) {
+    for (const ModelGroup& group : models) { rootGroups.emplace_back(group); }
+}
+
+void VBOController::drawVBOs() {
+    for (VBOGroup group : rootGroups) { group.draw(); }
+}
+
+void VBOController::drawVBOGroup(int index) {
+    rootGroups[index].draw();
 }

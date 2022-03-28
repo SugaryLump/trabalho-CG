@@ -27,14 +27,27 @@ class VBO {
     void draw();
 };
 
+class VBOGroup {
+   private:
+    std::vector<Transform> transformations;
+    std::vector<VBO> rootVBOs;
+    std::vector<VBOGroup> childVBOs;
+
+   public:
+    VBOGroup();
+    explicit VBOGroup(ModelGroup modelGroup);
+
+    void draw();
+};
+
 class VBOController {
    private:
-    std::vector<VBO> vbos;
+    std::vector<VBOGroup> rootGroups;
 
    public:
     VBOController() = default;
-    explicit VBOController(const std::vector<Model>& models);
+    explicit VBOController(const std::vector<ModelGroup>& models);
 
     void drawVBOs();
-    void drawVBO(int index);
+    void drawVBOGroup(int index);
 };
