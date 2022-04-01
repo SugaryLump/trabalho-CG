@@ -39,21 +39,51 @@ std::unique_ptr<Camera> parseCamera(pugi::xml_node node) noexcept {
     return c;
 }
 
-std::vector<Model> parseModels(pugi::xml_node node) noexcept {
+ModelGroup parseModel(pugi::xml_node node) noexcept {
     std::vector<Model> models;
-    for (pugi::xml_node models_node : node.child("models")) {
-        string name = models_node.name();
-        if (name == "model") {
-            const char* filename = models_node.attribute("file").value();
-            models.emplace_back(filename);
+    std::vector<Transform> transforms;
+
+    for (pugi::xml_node node : node.child("transform")) {
+        string name = node.name();
+        if (name == "translate") {
+            float x = stof(node.attribute("x").value());
+            float y = stof(node.attribute("y").value());
+            float z = stof(node.attribute("z").value());
+            transforms.push_back(Transform(Transform::TRANSLATE, Vector3(x, y, z)));
+        } else if (name == "rotate") {
+            float angle = stof(node.attribute("angle").value());
+            float x = stof(node.attribute("x").value());
+            float y = stof(node.attribute("y").value());
+            float z = stof(node.attribute("z").value());
+            transforms.push_back(Transform(Transform::ROTATE, Vector3(x, y, z), angle));
         }
     }
+
+    for (pugi::xml_node node_models : node.child("models")) {
+        string name = node_models.name();
+        if (name == "model") {
+            const char* filename = node_models.attribute("file").value();
+            Model model = models.emplace_back(filename);
+        }
+    }
+
+    ModelGroup model_group = ModelGroup(models, transforms);
+
+    for (pugi::xml_node node_models : node.child("group")) { model_group.addChildGroup(parseModel(node_models)); }
+
+    return model_group;
+}
+
+std::vector<ModelGroup> parseModels(pugi::xml_node node) noexcept {
+    std::vector<ModelGroup> models;
+    models.push_back(parseModel(node));
     return models;
 }
 
 std::optional<Config> parser(const std::string& filename) noexcept {
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(filename.c_str());
+    std::vector<ModelGroup> models;
 
     if (!result) {
         fmt::print(stderr, "error: {}\n", result);
@@ -66,7 +96,10 @@ std::optional<Config> parser(const std::string& filename) noexcept {
         if (name == "camera") {
             c.camera = parseCamera(node);
         } else if (name == "group") {
+            // TODO
             c.models = parseModels(node);
+            // c.models = models.push_back(parseModel(node));
+
             // std::cout << "Li X modelos :: " << c.models.size() << endl;
             // std::cout << c.models[0].vertices.size() << "\n";
             // std::cout << c.models[0].indices.size() << "\n";

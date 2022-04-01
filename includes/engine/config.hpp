@@ -7,7 +7,7 @@
 
 struct Config {
     std::unique_ptr<Camera> camera;
-    std::vector<Model> models;
+    std::vector<ModelGroup> models;
 
     Config();
 };

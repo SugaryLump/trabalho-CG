@@ -197,8 +197,8 @@ void render(int argc, char **argv, Config &config) {
 
     // put GLEW and VBO init here
     glewInit();
-    //TODO: Implement with ModelGroups
-    //vboController = std::make_unique<VBOController>(config.models);
+    // TODO: Implement with ModelGroups
+    vboController = std::make_unique<VBOController>(config.models);
 
     // some OpenGL settings
     glPolygonMode(GL_FRONT, GL_FILL);
