@@ -40,46 +40,43 @@ std::unique_ptr<Camera> parseCamera(pugi::xml_node node) noexcept {
 }
 
 ModelGroup parseModel(pugi::xml_node node) noexcept {
-    std::vector<Model> models;
-    std::vector<Transform> transforms;
     ModelGroup model_group = ModelGroup();
-    cout << "aqui entrei" << endl;
 
-    for (pugi::xml_node node : node.child("transform")) {
-        string name = node.name();
-        if (name == "translate") {
-            float x = stof(node.attribute("x").value());
-            float y = stof(node.attribute("y").value());
-            float z = stof(node.attribute("z").value());
-            transforms.push_back(Transform(Transform::TRANSLATE, Vector3(x, y, z)));
-        } else if (name == "rotate") {
-            float angle = stof(node.attribute("angle").value());
-            float x = stof(node.attribute("x").value());
-            float y = stof(node.attribute("y").value());
-            float z = stof(node.attribute("z").value());
-            transforms.push_back(Transform(Transform::ROTATE, Vector3(x, y, z), angle));
-        }
-    }
-
-    if (transforms.size() > 0) { model_group.transformations = transforms; }
-
-    for (pugi::xml_node node_models : node.child("models")) {
+    for (pugi::xml_node node_models : node) {
         string name = node_models.name();
-
-        if (name == "model") {
-            const char* filename = node_models.attribute("file").value();
-            cout << filename << "\n";
-            models.emplace_back(filename);
+        if (name == "transform") {
+            for (pugi::xml_node node : node_models) {
+                string name = node.name();
+                if (name == "translate") {
+                    float x = stof(node.attribute("x").value());
+                    float y = stof(node.attribute("y").value());
+                    float z = stof(node.attribute("z").value());
+                    model_group.transformations.push_back(Transform(Transform::TRANSLATE, Vector3(x, y, z)));
+                } else if (name == "rotate") {
+                    float angle = stof(node.attribute("angle").value());
+                    float x = stof(node.attribute("x").value());
+                    float y = stof(node.attribute("y").value());
+                    float z = stof(node.attribute("z").value());
+                    model_group.transformations.push_back(Transform(Transform::ROTATE, Vector3(x, y, z), angle));
+                } else if (name == "scale") {
+                    float x = stof(node.attribute("x").value());
+                    float y = stof(node.attribute("y").value());
+                    float z = stof(node.attribute("z").value());
+                    model_group.transformations.push_back(Transform(Transform::SCALE, Vector3(x, y, z)));
+                }
+            }
+        } else if (name == "models") {
+            for (pugi::xml_node node_models : node_models) {
+                string name = node_models.name();
+                if (name == "model") {
+                    const char* filename = node_models.attribute("file").value();
+                    model_group.rootModels.emplace_back(filename);
+                }
+            }
+        } else if (name == "group") {
+            model_group.addChildGroup(parseModel(node_models));
         }
     }
-
-    if (models.size() > 0) { model_group.rootModels = models; }
-    if (node.child("group")) {
-        cout << "aii caralho" << endl;
-        string name = node.name();
-        if (name == "group") { model_group.addChildGroup(parseModel(node.child("group"))); }
-    }
-
     return model_group;
 }
 
@@ -107,6 +104,7 @@ std::optional<Config> parser(const std::string& filename) noexcept {
         } else if (name == "group") {
             // TODO
             c.models = parseModels(node);
+            // c.models = parseModels(doc.child("world"));
             // c.models = models.push_back(parseModel(node));
 
             // std::cout << "Li X modelos :: " << c.models.size() << endl;
