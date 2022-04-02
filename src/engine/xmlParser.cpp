@@ -2,10 +2,10 @@
 
 #include <fmt/core.h>
 
+#include <iostream>
 #include <memory>
 #include <optional>
 #include <pugixml.hpp>
-
 using namespace std;
 
 namespace Parser {
@@ -42,6 +42,8 @@ std::unique_ptr<Camera> parseCamera(pugi::xml_node node) noexcept {
 ModelGroup parseModel(pugi::xml_node node) noexcept {
     std::vector<Model> models;
     std::vector<Transform> transforms;
+    ModelGroup model_group = ModelGroup();
+    cout << "aqui entrei" << endl;
 
     for (pugi::xml_node node : node.child("transform")) {
         string name = node.name();
@@ -59,17 +61,24 @@ ModelGroup parseModel(pugi::xml_node node) noexcept {
         }
     }
 
+    if (transforms.size() > 0) { model_group.transformations = transforms; }
+
     for (pugi::xml_node node_models : node.child("models")) {
         string name = node_models.name();
+
         if (name == "model") {
             const char* filename = node_models.attribute("file").value();
-            Model model = models.emplace_back(filename);
+            cout << filename << "\n";
+            models.emplace_back(filename);
         }
     }
 
-    ModelGroup model_group = ModelGroup(models, transforms);
-
-    for (pugi::xml_node node_models : node.child("group")) { model_group.addChildGroup(parseModel(node_models)); }
+    if (models.size() > 0) { model_group.rootModels = models; }
+    if (node.child("group")) {
+        cout << "aii caralho" << endl;
+        string name = node.name();
+        if (name == "group") { model_group.addChildGroup(parseModel(node.child("group"))); }
+    }
 
     return model_group;
 }
