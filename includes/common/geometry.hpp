@@ -80,6 +80,7 @@ class Model {
     static Model generateSphere(float radius, int slices, int stacks);
     static Model generateCone(float radius, float height, int slices, int stacks);
     static Model generateTorus(float radius, float tubeRadius, int hSlices, int vSlices);
+    static Model generateCylinder(float bRadius, float tRadius, float height, int slices, int stacks);
 };
 
 class ModelGroup {

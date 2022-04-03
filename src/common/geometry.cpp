@@ -447,6 +447,63 @@ Model Model::generateTorus(float radius, float tubeRadius, int tSlices, int pSli
     return torus;
 }
 
+Model Model::generateCylinder(float bRadius, float tRadius, float height, int slices, int stacks) {
+    Model cylinder = Model();
+
+    float sliceAngle = 2 * M_PI / slices;
+
+    //Vertexes
+    //Base and top
+    Vector3 baseCenter = Vector3(0, -height / 2, 0);
+    Vector3 topCenter = Vector3(0, height / 2, 0);
+    cylinder.addVertex(baseCenter);
+    cylinder.addVertex(topCenter);
+
+    //Body
+    for (int st = 0; st <= stacks; st++) {
+        float bodyRadius = bRadius -  st * ((bRadius - tRadius) / stacks);
+        float bodyHeight = -height / 2 + st * (height / stacks);
+        for(int sl = 0; sl < slices; sl++) {
+            float alpha = sl * sliceAngle;
+            Vector3 bodyV = Vector3::fromSpherical(alpha, 0, bodyRadius);
+            bodyV.applyVector(Vector3(0, bodyHeight, 0));
+            cylinder.addVertex(bodyV);
+        }
+    }
+
+    //Faces
+    for (int sl = 0; sl < slices; sl++) {
+        if (sl < slices - 1) {
+            //Bottom
+            cylinder.addFace(0, sl + 3, sl + 2);
+            //Top
+            cylinder.addFace(1, slices * (stacks) + 2 + sl, slices * (stacks) + 3 + sl);
+        }
+        else {
+            //Bottom
+            cylinder.addFace(0, 2, sl + 2);
+            //Top
+            cylinder.addFace(1, slices * (stacks) + 2 + sl, slices * (stacks) + 2);
+        }
+        for (int st = 0; st < stacks; st++) {
+            int v0 = st * slices + 2 + sl;
+            int v1;
+            if (sl < slices - 1) {
+                v1 = v0 + 1;  
+            }
+            else {
+                v1 = st * slices + 2;
+            }
+            int v2 = v0 + slices;
+            int v3 = v1 + slices;
+            cylinder.addFace(v0, v1, v2);
+            cylinder.addFace(v1, v3, v2);
+        }
+    }
+
+    return cylinder;
+}
+
 ModelGroup::ModelGroup(std::vector<Model> models, std::vector<Transform> transforms) {
     rootModels = models;
     transformations = transforms;

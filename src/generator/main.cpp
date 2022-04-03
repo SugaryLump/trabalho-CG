@@ -14,12 +14,12 @@ void printError(const std::string &error) {
 int main(int argc, char *argv[]) {
     argparse::ArgumentParser program(argv[0]);
     program.add_argument("filename").help("The file path to write to.");
-    program.add_argument("shape").help("[plane|box|sphere|cone|torus]");
+    program.add_argument("shape").help("[plane|box|sphere|cone|torus|cylinder]");
     program.add_argument("parameters")
         .help(
             "Plane: [length] [subdivisions]\n\t\tBox: [length] [subdivisions]\n\t\tSphere: [radius] [slices] "
             "[stacks]\n\t\tCone: [radius] [height] [slices] [stacks]\n\t\tTorus: [radius] [tube radius] [toroidal "
-            "slices] [poloidal slices]")
+            "slices] [poloidal slices]\n\t\tCylinder: [base radius] [top radius] [height] [slices] [stacks]")
         .remaining()
         .scan<'f', float>();
 
@@ -69,6 +69,13 @@ int main(int argc, char *argv[]) {
             std::exit(1);
         } else {
             model = Model::generateTorus(params[0], params[1], (int) params[2], (int) params[3]);
+        }
+    } else if (shape == "cylinder") {
+        if (params.size() != 5) {
+            std::cerr << program;
+            std::exit(1);
+        } else {
+            model = Model::generateCylinder(params[0], params[1], params[2], (int)params[3], (int)params[4]);
         }
     }
 
