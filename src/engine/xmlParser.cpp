@@ -102,7 +102,8 @@ std::optional<Config> parser(const std::string& filename) noexcept {
         if (name == "camera") {
             c.camera = parseCamera(node);
         } else if (name == "group") {
-            c.models = parseModels(node);
+            //c.models = parseModels(node);
+            c.models.push_back(parseModel(node));
         }
     }
     return c;

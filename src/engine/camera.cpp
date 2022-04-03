@@ -164,6 +164,6 @@ void Camera::updateFPS(InputState* input, float rateModifier) {
     position.y += (fVector.y * vMoveInput + sVector.y * hMoveInput + vertical) * rateModifier;
     position.z += (fVector.z * vMoveInput + sVector.z * hMoveInput) * rateModifier;
     look.x += (fVector.x * vMoveInput + sVector.x * hMoveInput) * rateModifier;
-    look.y += (fVector.y * vMoveInput + sVector.y * hMoveInput) * rateModifier;
+    look.y += (fVector.y * vMoveInput + sVector.y * hMoveInput + vertical) * rateModifier;
     look.z += (fVector.z * vMoveInput + sVector.z * hMoveInput) * rateModifier;
 }
