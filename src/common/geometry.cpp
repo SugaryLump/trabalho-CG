@@ -9,6 +9,27 @@
 
 using namespace std;
 
+//Auxiliary
+void buildRotationMatrix(float* x, float* y, float* z, float* matrix) {
+    matrix[0] = x[0]; matrix[1] = x[1]; matrix[2] = x[2]; matrix[3] = 0;
+	matrix[4] = y[0]; matrix[5] = y[1]; matrix[6] = y[2]; matrix[7] = 0;
+	matrix[8] = z[0]; matrix[9] = z[1]; matrix[10] = z[2]; matrix[11] = 0;
+	matrix[12] = 0; matrix[13] = 0; matrix[14] = 0; matrix[15] = 1;
+}
+
+void normalizeVector(float* vector) {
+    float l = sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]);
+	vector[0] = vector[0]/l;
+	vector[1] = vector[1]/l;
+	vector[2] = vector[2]/l;
+}
+
+void crossVectors (float* v1, float* v2, float* result) {
+    result[0] = v1[1] * v2[2] - v1[2] * v2[1];
+	result[1] = v1[2] * v2[0] - v1[0] * v2[2];
+	result[2] = v1[0] * v2[1] - v1[1] * v2[0];
+}
+
 // Vector3
 Vector3::Vector3(float x_, float y_, float z_) {
     x = x_;
@@ -36,16 +57,69 @@ void Vector3::applyVector(Vector3 vector) {
 }
 
 //Transform
-Transform::Transform(TransformType type_, Vector3 vector_) {
-    type = type_;
-    vector = vector_;
-    angle = 0;
+Translate::Translate(Vector3 vector) {
+    this->vector = vector;
 }
 
-Transform::Transform(TransformType type_, Vector3 vector_, float angle_) {
-    type = type_;
-    vector = vector_;
-    angle = angle_;
+Rotate::Rotate(Vector3 axis, float angle) {
+    this->axis = axis;
+    this->angle = angle;
+}
+
+Scale::Scale(Vector3 vector) {
+    this->vector = vector;
+}
+
+Curve::Curve(float** points, int pointCount, float seconds, bool align) {
+    this->points = points;
+    this->pointCount = pointCount;
+    this->seconds = seconds;
+    this->align = align;
+    float previousY[3] = {0.0f, 1.0f, 0.0f};
+    this->previousY = previousY;
+}
+
+void Curve::getCurrentPoint(float globalTime, float* pos, float* deriv) {
+    globalTime = globalTime / seconds;
+	float time = globalTime * pointCount;
+	int index = floor(time);
+	time = time - index;
+
+	// indices store the points
+	int indices[4]; 
+	indices[0] = (index + pointCount - 1) % pointCount;	
+	indices[1] = (indices[0] + 1) % pointCount;
+	indices[2] = (indices[1] + 1) % pointCount; 
+	indices[3] = (indices[2] + 1) % pointCount;
+
+	getCatmullRomPoint(time, points[indices[0]], points[indices[1]], points[indices[2]], points[indices[3]], pos, deriv);
+}
+
+
+void getCatmullRomPoint(float t, float *p0, float *p1, float *p2, float *p3, float* pos, float* deriv) {
+	// catmull-rom matrix
+	float m[16] = {		-0.5f,  1.5f, -1.5f,  0.5f,
+						 1.0f, -2.5f,  2.0f, -0.5f,
+						-0.5f,  0.0f,  0.5f,  0.0f,
+						 0.0f,  1.0f,  0.0f,  0.0f};
+
+	for (int i = 0; i < 3; i++) {
+		float a[4];
+		float p[4] = {p0[i], p1[i], p2[i], p3[i]};
+        for (int j = 0; j < 4; ++j) {
+            a[j] = 0;
+            for (int k = 0; k < 4; ++k) {
+                a[j] += p[k] * m[j * 4 + k];
+		    }
+        }
+		pos[i] = pow(t, 3) * a[0] + pow(t, 2) * a[1] + t * a[2] + a[3];
+		deriv[i] = 3 * pow(t, 2) * a[0] + 2 * t * a[1] + a[2];
+    }
+}
+
+TimedRotate::TimedRotate(Vector3 axis, float seconds) {
+    this->axis = axis;
+    this->seconds = seconds;
 }
 
 // Spherical

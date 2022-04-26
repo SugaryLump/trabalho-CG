@@ -37,7 +37,7 @@ class VBOGroup {
     VBOGroup();
     explicit VBOGroup(ModelGroup modelGroup);
 
-    void draw();
+    void draw(float time);
 };
 
 class VBOController {
@@ -48,6 +48,6 @@ class VBOController {
     VBOController() = default;
     explicit VBOController(const std::vector<ModelGroup>& models);
 
-    void drawVBOs();
-    void drawVBOGroup(int index);
+    void drawVBOs(float time);
+    void drawVBOGroup(int index, float time);
 };

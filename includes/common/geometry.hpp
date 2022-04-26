@@ -4,6 +4,10 @@
 #include <tuple>
 #include <vector>
 
+void buildRotationMatrix(float* x, float* y, float* z, float* matrix);
+void normalizeVector(float* vector);
+void crossVectors (float* v1, float* v2, float* result);
+
 class Vector3 {
    public:
     float x;
@@ -20,19 +24,51 @@ class Vector3 {
 
 class Transform {
    public:
-    enum TransformType {
-        TRANSLATE,
-        SCALE,
-        ROTATE,
-    };
-
-    TransformType type;
-    Vector3 vector;
-    float angle;
-
     Transform() = default;
-    Transform(TransformType type_, Vector3 vector_);
-    Transform(TransformType type_, Vector3 vector_, float angle_);
+    virtual void dummy() {}
+};
+
+class Translate: Transform {
+   public:
+    Vector3 vector; 
+
+    Translate(Vector3 vector);
+};
+
+class Rotate:Transform {
+   public:
+    Vector3 axis;
+    float angle; 
+
+    Rotate(Vector3 axis, float angle);
+};
+
+class Scale:Transform {
+   public:
+    Vector3 vector;
+
+    Scale(Vector3 vector);
+};
+
+class Curve:Transform {
+   public:
+    float** points;
+    int pointCount;
+    float seconds;
+    bool align;
+    float* previousY;
+
+    Curve(float** points, int pointCount, float seconds, bool align);
+    void getCurrentPoint(float globalTime, float* pos, float* deriv);
+    void getCatmullRomPoint(float time, float *p0, float *p1, float *p2, float *p3, float* pos, float* deriv);
+};
+
+class TimedRotate:Transform {
+   public:
+    Vector3 axis;
+    float seconds;
+
+    TimedRotate(Vector3 axis, float seconds);
 };
 
 class Spherical {

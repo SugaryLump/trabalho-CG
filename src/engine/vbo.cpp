@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <vector>
+#include <math.h>
 
 #include "common/geometry.hpp"
 #ifdef __APPLE__
@@ -80,20 +81,44 @@ VBOGroup::VBOGroup(ModelGroup modelGroup) {
     }
 }
 
-void VBOGroup::draw() {
+void VBOGroup::draw(float time) {
     glPushMatrix();
 
     for (Transform transform : transformations) {
-        switch(transform.type) {
-            case Transform::TRANSLATE:
-                glTranslatef(transform.vector.x, transform.vector.y, transform.vector.z);
-                break;
-            case Transform::SCALE:
-                glScalef(transform.vector.x, transform.vector.y, transform.vector.z);
-                break;
-            case Transform::ROTATE:
-                glRotatef(transform.angle, transform.vector.x, transform.vector.y, transform.vector.z);
-                break;
+        if (Translate* translate = dynamic_cast<Translate*>(&transform)) {
+            Vector3 vector = translate->vector;
+            glTranslatef(vector.x, vector.y, vector.z);
+        }
+        else if (Rotate* rotate = dynamic_cast<Rotate*>(&transform)) {
+            Vector3 axis = rotate->axis;
+            glRotatef(rotate->angle, axis.x, axis.y, axis.z);
+        }
+        else if (Scale* scale = dynamic_cast<Scale*>(&transform)) {
+            Vector3 vector = scale->vector;
+            glScalef(vector.x, vector.y, vector.z);
+        }
+        else if (Curve* curve = dynamic_cast<Curve*>(&transform)) {
+            float pos[3], x[3];
+            curve->getCurrentPoint(time, pos, x);
+            glTranslatef(pos[0], pos[1], pos[2]);
+            if (curve->align) {
+                float m[16], y[3], z[3];
+                normalizeVector(x);
+                crossVectors(x, curve->previousY, z);
+                crossVectors(z, x, y);
+                normalizeVector(y);
+                normalizeVector(z);
+                buildRotationMatrix(x, y, z, m);
+                glMultMatrixf(m);
+                curve->previousY = y;
+            }
+        }
+        else if (TimedRotate* timedRotate = dynamic_cast<TimedRotate*>(&transform)) {
+            Vector3 axis = rotate->axis;
+            float progress = time / timedRotate->seconds;
+            progress -= floor(progress);
+            float angle = progress * 360;
+            glRotatef(axis.x, axis.y, axis.z, angle);
         }
     }
 
@@ -102,7 +127,7 @@ void VBOGroup::draw() {
     }
     
     for (VBOGroup childGroup : childVBOs) {
-        childGroup.draw();
+        childGroup.draw(time);
     }
 
     glPopMatrix();
@@ -112,10 +137,10 @@ VBOController::VBOController(const std::vector<ModelGroup>& models) {
     for (const ModelGroup& group : models) { rootGroups.emplace_back(group); }
 }
 
-void VBOController::drawVBOs() {
-    for (VBOGroup group : rootGroups) { group.draw(); }
+void VBOController::drawVBOs(float time) {
+    for (VBOGroup group : rootGroups) { group.draw(time); }
 }
 
-void VBOController::drawVBOGroup(int index) {
-    rootGroups[index].draw();
+void VBOController::drawVBOGroup(int index, float time) {
+    rootGroups[index].draw(time);
 }

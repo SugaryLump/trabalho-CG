@@ -31,7 +31,7 @@ static int line = GL_FILL;
 static int windowWidth = 800;
 static int windowHeight = 800;
 static bool mouseWarping = false;
-static int timebase;
+static int timeBase, startTime;
 
 void changeSize(int w, int h) {
     windowWidth = w;
@@ -95,7 +95,7 @@ void renderScene() {
 
     glPolygonMode(GL_FRONT_AND_BACK, line);
 
-    vboController->drawVBOs();
+    vboController->drawVBOs(timeBase - startTime);
 
     // End of frame
     glutSwapBuffers();
@@ -132,8 +132,8 @@ void passiveMouseHandler(int x, int y) {
 void update() {
     // Framerates
     int time = glutGet(GLUT_ELAPSED_TIME);
-    float fps = 1000.0f / (time - timebase);
-    timebase = time;
+    float fps = 1000.0f / (time - timeBase);
+    timeBase = time;
     float rateModifier = 60 / fps;
 
     // Handle inputs
@@ -181,7 +181,8 @@ void render(int argc, char **argv, Config &config) {
     glutInitWindowPosition(100, 100);
     glutInitWindowSize(800, 800);
     glutCreateWindow("CG-Engine");
-    timebase = glutGet(GLUT_ELAPSED_TIME);
+    timeBase = glutGet(GLUT_ELAPSED_TIME);
+    startTime = timeBase;
 
     // put callback registry here
     glutDisplayFunc(renderScene);
