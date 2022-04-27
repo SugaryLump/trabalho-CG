@@ -3,6 +3,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include <memory>
 
 void buildRotationMatrix(float* x, float* y, float* z, float* matrix);
 void normalizeVector(float* vector);
@@ -28,14 +29,14 @@ class Transform {
     virtual void dummy() {}
 };
 
-class Translate: Transform {
+class Translate:public Transform {
    public:
     Vector3 vector; 
 
     Translate(Vector3 vector);
 };
 
-class Rotate:Transform {
+class Rotate:public Transform {
    public:
     Vector3 axis;
     float angle; 
@@ -43,27 +44,27 @@ class Rotate:Transform {
     Rotate(Vector3 axis, float angle);
 };
 
-class Scale:Transform {
+class Scale:public Transform {
    public:
     Vector3 vector;
 
     Scale(Vector3 vector);
 };
 
-class Curve:Transform {
+class Curve:public Transform {
    public:
-    float** points;
+    std::vector<std::vector<float>> points;
     int pointCount;
     float seconds;
     bool align;
-    float* previousY;
+    std::vector<float> previousY;
 
-    Curve(float** points, int pointCount, float seconds, bool align);
+    Curve(std::vector<std::vector<float>> points, int pointCount, float seconds, bool align);
+    void getCatmullRomPoint(float time, std::vector<float> p0, std::vector<float> p1, std::vector<float> p2, std::vector<float> p3, float* pos, float* deriv);
     void getCurrentPoint(float globalTime, float* pos, float* deriv);
-    void getCatmullRomPoint(float time, float *p0, float *p1, float *p2, float *p3, float* pos, float* deriv);
 };
 
-class TimedRotate:Transform {
+class TimedRotate:public Transform {
    public:
     Vector3 axis;
     float seconds;
@@ -117,11 +118,12 @@ class Model {
     static Model generateCone(float radius, float height, int slices, int stacks);
     static Model generateTorus(float radius, float tubeRadius, int hSlices, int vSlices);
     static Model generateCylinder(float bRadius, float tRadius, float height, int slices, int stacks);
+    static Model generateBezierPatch(std::string controlPointsFileName, int tessellation);
 };
 
 class ModelGroup {
    public:
-    std::vector<Transform> transformations;
+    std::vector<std::shared_ptr<Transform>> transformations;
     std::vector<Model> rootModels;
     std::vector<ModelGroup> childModels;
 
@@ -129,7 +131,7 @@ class ModelGroup {
      * @brief Cria um grupos de modelos vazio
      */
     ModelGroup() = default;
-    ModelGroup(std::vector<Model> models, std::vector<Transform> transforms);
+    ModelGroup(std::vector<Model> models, std::vector<std::shared_ptr<Transform>> transforms);
 
     void addChildGroup(ModelGroup childGroup);
 };

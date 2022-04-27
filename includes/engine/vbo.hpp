@@ -29,7 +29,7 @@ class VBO {
 
 class VBOGroup {
    private:
-    std::vector<Transform> transformations;
+    std::vector<std::shared_ptr<Transform>> transformations;
     std::vector<VBO> rootVBOs;
     std::vector<VBOGroup> childVBOs;
 

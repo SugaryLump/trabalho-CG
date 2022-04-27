@@ -48,21 +48,55 @@ ModelGroup parseModel(pugi::xml_node node) noexcept {
             for (pugi::xml_node node : node_models) {
                 string name = node.name();
                 if (name == "translate") {
-                    float x = stof(node.attribute("x").value());
-                    float y = stof(node.attribute("y").value());
-                    float z = stof(node.attribute("z").value());
-                    model_group.transformations.push_back(Transform(Transform::TRANSLATE, Vector3(x, y, z)));
+                    pugi::xml_attribute timeAttribute = node.attribute("time");
+                    if (timeAttribute) {
+                        float seconds = stof(timeAttribute.value());
+                        bool align = strcmp(node.attribute("align").value(), "False");
+                        std::vector<std::vector<float>> points;
+                        for (pugi::xml_node node_translate : node) {
+                            string name = node_translate.name();
+                            if (name == "point") {
+                                float x = stof(node_translate.attribute("x").value());
+                                float y = stof(node_translate.attribute("y").value());
+                                float z = stof(node_translate.attribute("z").value());
+                                std::vector<float> point;
+                                point.push_back(x);
+                                point.push_back(y);
+                                point.push_back(z);
+                                points.push_back(point);
+                            }
+                        }
+                        shared_ptr<Curve> curve = make_shared<Curve>(points, points.size(), seconds, align);
+                        model_group.transformations.push_back(curve);
+                    }
+                    else {
+                        float x = stof(node.attribute("x").value());
+                        float y = stof(node.attribute("y").value());
+                        float z = stof(node.attribute("z").value());
+                        shared_ptr<Translate> translate = make_shared<Translate>(Vector3(x, y, z));
+                        model_group.transformations.push_back(translate);
+                    }
                 } else if (name == "rotate") {
-                    float angle = stof(node.attribute("angle").value());
                     float x = stof(node.attribute("x").value());
                     float y = stof(node.attribute("y").value());
                     float z = stof(node.attribute("z").value());
-                    model_group.transformations.push_back(Transform(Transform::ROTATE, Vector3(x, y, z), angle));
+                    pugi::xml_attribute angleAttribute = node.attribute("angle");
+                    if (angleAttribute) {
+                        float angle = stof(angleAttribute.value());
+                        shared_ptr<Rotate> rotate = make_shared<Rotate>(Vector3(x, y, z), angle);
+                        model_group.transformations.push_back(rotate);
+                    }
+                    else {
+                        float time = stof(node.attribute("time").value());
+                        shared_ptr<TimedRotate> timedRotate = make_shared<TimedRotate>(Vector3(x, y, z), time);
+                        model_group.transformations.push_back(timedRotate);
+                    }
                 } else if (name == "scale") {
                     float x = stof(node.attribute("x").value());
                     float y = stof(node.attribute("y").value());
                     float z = stof(node.attribute("z").value());
-                    model_group.transformations.push_back(Transform(Transform::SCALE, Vector3(x, y, z)));
+                    shared_ptr<Scale> scale = make_shared<Scale>(Vector3(x, y, z));
+                    model_group.transformations.push_back(scale);
                 }
             }
         } else if (name == "models") {

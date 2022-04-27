@@ -3,6 +3,7 @@
 #include <math.h>
 
 #include <fstream>
+#include <sstream>
 #include <iostream>
 #include <tuple>
 #include <vector>
@@ -28,6 +29,18 @@ void crossVectors (float* v1, float* v2, float* result) {
     result[0] = v1[1] * v2[2] - v1[2] * v2[1];
 	result[1] = v1[2] * v2[0] - v1[0] * v2[2];
 	result[2] = v1[0] * v2[1] - v1[1] * v2[0];
+}
+
+void multiplyMatrixes (float* m1, int cols1, int lines1, float* m2, int cols2, float* result) {
+    for (int l = 0; l < lines1; l++) {
+        for (int c = 0; c < cols2; c++) {
+            int index = l * cols2 + c;
+            result[index] = 0;
+            for (int i = 0; i < cols1; i++) {
+                result[index] += m1[l * cols1 + i] * m2[i * cols2 + c];
+            }
+        }
+    }
 }
 
 // Vector3
@@ -70,33 +83,18 @@ Scale::Scale(Vector3 vector) {
     this->vector = vector;
 }
 
-Curve::Curve(float** points, int pointCount, float seconds, bool align) {
+Curve::Curve(std::vector<std::vector<float>> points, int pointCount, float seconds, bool align) {
     this->points = points;
     this->pointCount = pointCount;
     this->seconds = seconds;
     this->align = align;
-    float previousY[3] = {0.0f, 1.0f, 0.0f};
+    std::vector<float> previousY;
+    previousY.push_back(0);
+    previousY.push_back(1);
+    previousY.push_back(0);
     this->previousY = previousY;
 }
-
-void Curve::getCurrentPoint(float globalTime, float* pos, float* deriv) {
-    globalTime = globalTime / seconds;
-	float time = globalTime * pointCount;
-	int index = floor(time);
-	time = time - index;
-
-	// indices store the points
-	int indices[4]; 
-	indices[0] = (index + pointCount - 1) % pointCount;	
-	indices[1] = (indices[0] + 1) % pointCount;
-	indices[2] = (indices[1] + 1) % pointCount; 
-	indices[3] = (indices[2] + 1) % pointCount;
-
-	getCatmullRomPoint(time, points[indices[0]], points[indices[1]], points[indices[2]], points[indices[3]], pos, deriv);
-}
-
-
-void getCatmullRomPoint(float t, float *p0, float *p1, float *p2, float *p3, float* pos, float* deriv) {
+void Curve::getCatmullRomPoint(float time, std::vector<float> p0, std::vector<float> p1, std::vector<float> p2, std::vector<float> p3, float* pos, float* deriv) {
 	// catmull-rom matrix
 	float m[16] = {		-0.5f,  1.5f, -1.5f,  0.5f,
 						 1.0f, -2.5f,  2.0f, -0.5f,
@@ -112,9 +110,25 @@ void getCatmullRomPoint(float t, float *p0, float *p1, float *p2, float *p3, flo
                 a[j] += p[k] * m[j * 4 + k];
 		    }
         }
-		pos[i] = pow(t, 3) * a[0] + pow(t, 2) * a[1] + t * a[2] + a[3];
-		deriv[i] = 3 * pow(t, 2) * a[0] + 2 * t * a[1] + a[2];
+		pos[i] = pow(time, 3) * a[0] + pow(time, 2) * a[1] + time * a[2] + a[3];
+		deriv[i] = 3 * pow(time, 2) * a[0] + 2 * time * a[1] + a[2];
     }
+}
+
+void Curve::getCurrentPoint(float globalTime, float* pos, float* deriv) {
+    globalTime = globalTime / seconds;
+	float time = globalTime * pointCount;
+	int index = floor(time);
+	time = time - index;
+
+	// indices store the points
+	int indices[4]; 
+	indices[0] = (index + pointCount - 1) % pointCount;	
+	indices[1] = (indices[0] + 1) % pointCount;
+	indices[2] = (indices[1] + 1) % pointCount; 
+	indices[3] = (indices[2] + 1) % pointCount;
+
+	this->getCatmullRomPoint(time, points[indices[0]], points[indices[1]], points[indices[2]], points[indices[3]], pos, deriv);
 }
 
 TimedRotate::TimedRotate(Vector3 axis, float seconds) {
@@ -578,7 +592,99 @@ Model Model::generateCylinder(float bRadius, float tRadius, float height, int sl
     return cylinder;
 }
 
-ModelGroup::ModelGroup(std::vector<Model> models, std::vector<Transform> transforms) {
+Model Model::generateBezierPatch(std::string pointsFileName, int tessellation) {
+    Model patch = Model();
+    int totalPatches;
+    int totalPoints;
+    vector<vector<int>> patchesIndices;
+    vector<vector<float>> points;
+
+    string line;
+    ifstream file(pointsFileName);
+
+    //Reading the control point indices
+    getline(file, line);
+    sscanf(line.c_str(), "%d\n", &totalPatches);
+    for (int p = 0; p < totalPatches; p++) {
+        getline(file, line);
+        stringstream stream = stringstream(line);
+        vector<int> indices;
+        for (int v = 0; v < 16; v++) {
+            string indexString;
+            int index;
+            getline(stream, indexString, ',');
+            sscanf(indexString.c_str(), "%d", &index);
+            indices.push_back(index);
+        }
+        patchesIndices.push_back(indices);
+    }
+
+    //Reading the control points
+    getline(file, line);
+    sscanf(line.c_str(), "%d\n", &totalPoints);
+    for (int v = 0; v < totalPoints; v++) {
+        vector<float> point;
+        float x, y, z;
+        getline(file, line);
+        sscanf(line.c_str(), "%f, %f, %f", &x, &y, &z);
+        point.push_back(x);
+        point.push_back(y);
+        point.push_back(z);
+        points.push_back(point);
+    }
+
+    float m[16] = { -1.0f,  3.0f, -3.0f,  1.0f,
+                     3.0f, -6.0f,  3.0f,  0.0f,
+                    -3.0f,  3.0f,  0.0f,  0.0f,
+                     1.0f,  0.0f,  0.0f,  0.0f };
+    //Generating the patches
+    for (int pi = 0; pi < totalPatches; pi++) {
+        //Generating the points
+        for(int udiv = 0; udiv <= tessellation; udiv++) {
+            for (int vdiv = 0; vdiv <= tessellation; vdiv++) {
+                float u = 1.0f / tessellation * udiv;
+                float v = 1.0f / tessellation * vdiv;
+                float um[4] = {powf(u, 3), powf(u, 2), u, 1};
+                float vm[4] = {powf(v, 3), powf(v, 2), v, 1};
+
+                float point[3];
+                for (int c = 0; c < 3; c++) {
+                    vector<int> inds = patchesIndices[pi];
+                    float p[16] = { points[inds[0]][c], points[inds[4]][c], points[inds[8]][c], points[inds[12]][c],
+                                    points[inds[1]][c], points[inds[5]][c], points[inds[9]][c], points[inds[13]][c],
+                                    points[inds[2]][c], points[inds[6]][c], points[inds[10]][c], points[inds[14]][c],
+                                    points[inds[3]][c], points[inds[7]][c], points[inds[11]][c], points[inds[15]][c]};
+                    float tmp1[4], tmp2[4], tmp3[4];
+                    float result;
+                    multiplyMatrixes(um, 4, 1, m, 4, tmp1);
+                    multiplyMatrixes(tmp1, 4, 1, p, 4, tmp2);
+                    multiplyMatrixes(tmp2, 4, 1, m, 4, tmp3);
+                    multiplyMatrixes(tmp3, 4, 1, vm, 1, &result);
+                    point[c] = result;
+                }
+
+                patch.addVertex(Vector3(point[0], point[1], point[2]));
+            }
+        }
+
+        //Generating the faces
+        for(int udiv = 0; udiv < tessellation; udiv++) {
+            for (int vdiv = 0; vdiv < tessellation; vdiv++) {
+                int patchPointsStart = (tessellation + 1) * (tessellation +1) * pi;
+                int v1 = udiv * (tessellation + 1) + vdiv + patchPointsStart;
+                int v2 = v1 + 1;
+                int v3 = v1 + tessellation + 1;
+                int v4 = v3 + 1;
+                patch.addFace(v3, v2, v1);
+                patch.addFace(v3, v4, v2);
+            }
+        }
+    }
+
+    return patch;
+}
+
+ModelGroup::ModelGroup(std::vector<Model> models, std::vector<std::shared_ptr<Transform>> transforms) {
     rootModels = models;
     transformations = transforms;
 }

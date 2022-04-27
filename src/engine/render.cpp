@@ -95,8 +95,7 @@ void renderScene() {
 
     glPolygonMode(GL_FRONT_AND_BACK, line);
 
-    vboController->drawVBOs(timeBase - startTime);
-
+    vboController->drawVBOs((timeBase - startTime) / 1000.0f);
     // End of frame
     glutSwapBuffers();
 }

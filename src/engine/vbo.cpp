@@ -84,41 +84,43 @@ VBOGroup::VBOGroup(ModelGroup modelGroup) {
 void VBOGroup::draw(float time) {
     glPushMatrix();
 
-    for (Transform transform : transformations) {
-        if (Translate* translate = dynamic_cast<Translate*>(&transform)) {
+    for (std::shared_ptr<Transform> transform : transformations) {
+        if (Translate* translate = dynamic_cast<Translate*>(transform.get())) {
             Vector3 vector = translate->vector;
             glTranslatef(vector.x, vector.y, vector.z);
         }
-        else if (Rotate* rotate = dynamic_cast<Rotate*>(&transform)) {
+        else if (Rotate* rotate = dynamic_cast<Rotate*>(transform.get())) {
             Vector3 axis = rotate->axis;
             glRotatef(rotate->angle, axis.x, axis.y, axis.z);
         }
-        else if (Scale* scale = dynamic_cast<Scale*>(&transform)) {
+        else if (Scale* scale = dynamic_cast<Scale*>(transform.get())) {
             Vector3 vector = scale->vector;
             glScalef(vector.x, vector.y, vector.z);
         }
-        else if (Curve* curve = dynamic_cast<Curve*>(&transform)) {
+        else if (Curve* curve = dynamic_cast<Curve*>(transform.get())) {
             float pos[3], x[3];
             curve->getCurrentPoint(time, pos, x);
             glTranslatef(pos[0], pos[1], pos[2]);
             if (curve->align) {
                 float m[16], y[3], z[3];
                 normalizeVector(x);
-                crossVectors(x, curve->previousY, z);
+                crossVectors(x, curve->previousY.data(), z);
                 crossVectors(z, x, y);
                 normalizeVector(y);
                 normalizeVector(z);
                 buildRotationMatrix(x, y, z, m);
                 glMultMatrixf(m);
-                curve->previousY = y;
+                curve->previousY[0] = y[0];
+                curve->previousY[1] = y[1];
+                curve->previousY[2] = y[2];
             }
         }
-        else if (TimedRotate* timedRotate = dynamic_cast<TimedRotate*>(&transform)) {
-            Vector3 axis = rotate->axis;
+        else if (TimedRotate* timedRotate = dynamic_cast<TimedRotate*>(transform.get())) {
+            Vector3 axis = timedRotate->axis;
             float progress = time / timedRotate->seconds;
             progress -= floor(progress);
             float angle = progress * 360;
-            glRotatef(axis.x, axis.y, axis.z, angle);
+            glRotatef(angle, axis.x, axis.y, axis.z);
         }
     }
 
