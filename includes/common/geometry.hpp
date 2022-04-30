@@ -94,6 +94,18 @@ class Triangle {
     Triangle(Vector3 v1, Vector3 v2, Vector3 v3);
 };
 
+class PatchData {
+   public:
+    std::vector<std::vector<int>> patchesIndices;
+    std::vector<std::vector<float>> points;
+
+    PatchData() = default;
+    PatchData(const std::string& patchFileName);
+
+    int getPatchCount();
+    void addPoint(Vector3 point);
+};
+
 class Model {
    public:
     std::vector<float> vertices;
@@ -118,7 +130,8 @@ class Model {
     static Model generateCone(float radius, float height, int slices, int stacks);
     static Model generateTorus(float radius, float tubeRadius, int hSlices, int vSlices);
     static Model generateCylinder(float bRadius, float tRadius, float height, int slices, int stacks);
-    static Model generateBezierPatch(std::string controlPointsFileName, int tessellation);
+    static Model generateBezierPatch(PatchData patchData, int tessellation);
+    static Model generateComet(float radius, int randomness, int tessellation);
 };
 
 class ModelGroup {

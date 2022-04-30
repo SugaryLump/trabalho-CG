@@ -163,6 +163,58 @@ Triangle::Triangle(Vector3 v1, Vector3 v2, Vector3 v3) {
     p3 = v3;
 }
 
+//PatchData
+PatchData::PatchData(const string& patchFileName) {
+    int totalPatches;
+    int totalPoints;
+
+    string line;
+    ifstream file(patchFileName);
+
+    //Reading the control point indices
+    getline(file, line);
+    sscanf(line.c_str(), "%d\n", &totalPatches);
+    for (int p = 0; p < totalPatches; p++) {
+        getline(file, line);
+        stringstream stream = stringstream(line);
+        vector<int> indices;
+        for (int v = 0; v < 16; v++) {
+            string indexString;
+            int index;
+            getline(stream, indexString, ',');
+            sscanf(indexString.c_str(), "%d", &index);
+            indices.push_back(index);
+        }
+        patchesIndices.push_back(indices);
+    }
+
+    //Reading the control points
+    getline(file, line);
+    sscanf(line.c_str(), "%d\n", &totalPoints);
+    for (int v = 0; v < totalPoints; v++) {
+        vector<float> point;
+        float x, y, z;
+        getline(file, line);
+        sscanf(line.c_str(), "%f, %f, %f", &x, &y, &z);
+        point.push_back(x);
+        point.push_back(y);
+        point.push_back(z);
+        points.push_back(point);
+    }
+}
+
+int PatchData::getPatchCount() {
+    return patchesIndices.size();
+}
+
+void PatchData::addPoint(Vector3 point) {
+    vector<float> newPoint;
+    newPoint.push_back(point.x);
+    newPoint.push_back(point.y);
+    newPoint.push_back(point.z);
+    points.push_back(newPoint);
+}
+
 // Model
 Model::Model(const string& path) {
     string line;
@@ -592,53 +644,15 @@ Model Model::generateCylinder(float bRadius, float tRadius, float height, int sl
     return cylinder;
 }
 
-Model Model::generateBezierPatch(std::string pointsFileName, int tessellation) {
+Model Model::generateBezierPatch(PatchData patchData, int tessellation) {
     Model patch = Model();
-    int totalPatches;
-    int totalPoints;
-    vector<vector<int>> patchesIndices;
-    vector<vector<float>> points;
-
-    string line;
-    ifstream file(pointsFileName);
-
-    //Reading the control point indices
-    getline(file, line);
-    sscanf(line.c_str(), "%d\n", &totalPatches);
-    for (int p = 0; p < totalPatches; p++) {
-        getline(file, line);
-        stringstream stream = stringstream(line);
-        vector<int> indices;
-        for (int v = 0; v < 16; v++) {
-            string indexString;
-            int index;
-            getline(stream, indexString, ',');
-            sscanf(indexString.c_str(), "%d", &index);
-            indices.push_back(index);
-        }
-        patchesIndices.push_back(indices);
-    }
-
-    //Reading the control points
-    getline(file, line);
-    sscanf(line.c_str(), "%d\n", &totalPoints);
-    for (int v = 0; v < totalPoints; v++) {
-        vector<float> point;
-        float x, y, z;
-        getline(file, line);
-        sscanf(line.c_str(), "%f, %f, %f", &x, &y, &z);
-        point.push_back(x);
-        point.push_back(y);
-        point.push_back(z);
-        points.push_back(point);
-    }
 
     float m[16] = { -1.0f,  3.0f, -3.0f,  1.0f,
                      3.0f, -6.0f,  3.0f,  0.0f,
                     -3.0f,  3.0f,  0.0f,  0.0f,
                      1.0f,  0.0f,  0.0f,  0.0f };
     //Generating the patches
-    for (int pi = 0; pi < totalPatches; pi++) {
+    for (int pi = 0; pi < patchData.getPatchCount(); pi++) {
         //Generating the points
         for(int udiv = 0; udiv <= tessellation; udiv++) {
             for (int vdiv = 0; vdiv <= tessellation; vdiv++) {
@@ -649,11 +663,11 @@ Model Model::generateBezierPatch(std::string pointsFileName, int tessellation) {
 
                 float point[3];
                 for (int c = 0; c < 3; c++) {
-                    vector<int> inds = patchesIndices[pi];
-                    float p[16] = { points[inds[0]][c], points[inds[4]][c], points[inds[8]][c], points[inds[12]][c],
-                                    points[inds[1]][c], points[inds[5]][c], points[inds[9]][c], points[inds[13]][c],
-                                    points[inds[2]][c], points[inds[6]][c], points[inds[10]][c], points[inds[14]][c],
-                                    points[inds[3]][c], points[inds[7]][c], points[inds[11]][c], points[inds[15]][c]};
+                    vector<int> inds = patchData.patchesIndices[pi];
+                    float p[16] = { patchData.points[inds[0]][c], patchData.points[inds[1]][c], patchData.points[inds[2]][c], patchData.points[inds[3]][c],
+                                    patchData.points[inds[4]][c], patchData.points[inds[5]][c], patchData.points[inds[6]][c], patchData.points[inds[7]][c],
+                                    patchData.points[inds[8]][c], patchData.points[inds[9]][c], patchData.points[inds[10]][c], patchData.points[inds[11]][c],
+                                    patchData.points[inds[12]][c], patchData.points[inds[13]][c], patchData.points[inds[14]][c], patchData.points[inds[15]][c]};
                     float tmp1[4], tmp2[4], tmp3[4];
                     float result;
                     multiplyMatrixes(um, 4, 1, m, 4, tmp1);
@@ -675,13 +689,69 @@ Model Model::generateBezierPatch(std::string pointsFileName, int tessellation) {
                 int v2 = v1 + 1;
                 int v3 = v1 + tessellation + 1;
                 int v4 = v3 + 1;
-                patch.addFace(v3, v2, v1);
-                patch.addFace(v3, v4, v2);
+                patch.addFace(v1, v2, v3);
+                patch.addFace(v2, v4, v3);
             }
         }
     }
 
     return patch;
+}
+
+Model Model::generateComet(float radius, int randomness, int tessellation) {
+    PatchData patchData = PatchData();
+    srand(time(0));
+
+    patchData.addPoint(Vector3(0, -radius, 0));
+    patchData.addPoint(Vector3(0, radius, 0));
+    for (int st = 0; st < 5; st++) {
+        for (int sl = 0; sl < 12; sl++) {
+            float alpha = sl * 2 * M_PI / 12;
+            float beta = -M_PI_2 + (st + 1) * M_PI / 6;
+            float height = radius * ( 1 + (rand() % randomness - (randomness - 1) / 2.0f) / 10);
+            Vector3 point = Vector3::fromSpherical(alpha, beta, height);
+            patchData.addPoint(point);
+        }
+    }
+
+    for (int p = 0; p < 8; p++) {
+        vector<int> indices;
+        if (p < 4) {
+            for (int i = 0; i < 4; i++) {
+                indices.push_back(0);
+            }
+            for (int c = 0; c < 3; c++) {
+                indices.push_back(2 + p * 3 + c * 12);
+                indices.push_back(3 + p * 3 + c * 12);
+                indices.push_back(4 + p * 3 + c * 12);
+                if (p != 3) {
+                    indices.push_back(5 + p * 3 + c * 12);
+                }
+                else {
+                    indices.push_back(2 + c * 12);
+                }
+            }
+        }
+        else {
+            for (int i = 0; i < 4; i++) {
+                indices.push_back(1);
+            }
+            for (int c = 0; c < 3; c++) {
+                if (p != 7) {
+                    indices.push_back(53 + (p - 4) * 3 - c * 12);
+                }
+                else {
+                    indices.push_back(50 - c * 12);
+                }
+                indices.push_back(52 + (p - 4) * 3 - c * 12);
+                indices.push_back(51 + (p - 4) * 3 - c * 12);
+                indices.push_back(50 + (p - 4) * 3 - c * 12);
+            }
+        }
+        patchData.patchesIndices.push_back(indices);
+    }
+
+    return Model::generateBezierPatch(patchData, tessellation);
 }
 
 ModelGroup::ModelGroup(std::vector<Model> models, std::vector<std::shared_ptr<Transform>> transforms) {

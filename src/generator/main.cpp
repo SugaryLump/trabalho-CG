@@ -15,13 +15,13 @@ void printError(const std::string &error) {
 int main(int argc, char *argv[]) {
     argparse::ArgumentParser program(argv[0]);
     program.add_argument("filename").help("The file path to write to.");
-    program.add_argument("shape").help("[plane|box|sphere|cone|torus|cylinder|bezier]");
+    program.add_argument("shape").help("[plane|box|sphere|cone|torus|cylinder|bezier|comet]");
     program.add_argument("parameters")
         .help(
             "Plane: [length] [subdivisions]\n\t\tBox: [length] [subdivisions]\n\t\tSphere: [radius] [slices] "
             "[stacks]\n\t\tCone: [radius] [height] [slices] [stacks]\n\t\tTorus: [radius] [tube radius] [toroidal "
             "slices] [poloidal slices]\n\t\tCylinder: [base radius] [top radius] [height] [slices] [stacks]\n\t\t"
-            "Bezier Patches: [patch file path] [tessellation]")
+            "Bezier Patches: [patch file path] [tessellation]\n\t\tComet: [radius] [randomness] [tessellation]")
         .remaining();
 
     try {
@@ -83,7 +83,15 @@ int main(int argc, char *argv[]) {
             std::cerr << program;
             std::exit(1);
         } else {
-            model = Model::generateBezierPatch(params[0], stoi(params[1]));
+            PatchData patchData = PatchData(params[0]);
+            model = Model::generateBezierPatch(patchData, stoi(params[1]));
+        }
+    } else if (shape == "comet") {
+        if (params.size() != 3) {
+            std::cerr << program;
+            std::exit(1);
+        } else {
+            model = Model::generateComet(stof(params[0]), stoi(params[1]), stoi(params[2]));
         }
     }
 

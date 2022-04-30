@@ -1,0 +1,230 @@
+<world> 
+    <camera> 
+	    <position x="-10" y="25" z="50" />
+	    <lookAt x="160" y="0" z="0" />
+	    <up x="0" y="1" z="0" /> <!-- optional, use these values as default-->
+        <projection fov="60" near="0.1" far="1000" /> <!-- optional, use these values as default-->
+    </camera>
+	<group> 
+  		<models> 
+			<model file="sun.3d" /> <!-- generator bezier teapot.patch 10 bezier.3d -->
+ 		</models>
+		<group>
+		 	<transform>
+			 	<rotate time="14.47" x="0" y="1" z="0"/>
+				<translate x="30" y="0" z="0" />
+			</transform>
+			<models>
+				<model file="mercury.3d" />
+			</models>
+		</group>
+		<group>
+		 	<transform>
+			 	<rotate time="37" x="0" y="1" z="0"/>
+				<translate x="35" y="0" z="0" />
+			</transform>
+			<models>
+				<model file="venus.3d" />
+			</models>
+		</group>
+		<group>
+		 	<transform>
+			 	<rotate time="60" x="0" y="1" z="0"/>
+				<translate x="40" y="0" z="0" />
+			</transform>
+			<models>
+				<model file="earth.3d" />
+			</models>
+		</group>
+		<group>
+		 	<transform>
+			 	<rotate time="120" x="0" y="1" z="0"/>
+				<translate x="46" y="0" z="0" />
+			</transform>
+			<models>
+				<model file="mars.3d" />
+			</models>
+		</group>
+		<group>
+		 	<transform>
+			 	<rotate time="250" x="0" y="1" z="0"/>
+				<translate x="65" y="0" z="0" />
+			</transform>
+			<models>
+				<model file="jupiter.3d" />
+			</models>
+		</group>
+		<group>
+		 	<transform>
+			 	<rotate time="300" x="0" y="1" z="0"/>
+				<translate x="105" y="0" z="0" />
+			</transform>
+			<models>
+				<model file="saturn.3d" />
+			</models>
+			<group>
+				<transform>
+					<rotate time="5" x="0.1" y="0.9" z="0" />
+				</transform>
+				<models>
+					<model file="saturn_ring1.3d" />
+					<model file="saturn_ring2.3d" />
+				</models>
+			</group>
+		</group>
+		<group>
+		 	<transform>
+			 	<rotate time="400" x="0" y="1" z="0"/>
+				<translate x="130" y="0" z="0" />
+			</transform>
+			<models>
+				<model file="uranus.3d" />
+			</models>
+		</group>
+		<group>
+		 	<transform>
+			 	<rotate time="500" x="0" y="1" z="0"/>
+				<translate x="160" y="0" z="0" />
+			</transform>
+			<models>
+				<model file="neptune.3d" />
+			</models>
+		</group>
+		<group>
+			<transform>
+				<translate time="10" align="False">
+					<point x="160" y="2" z="40" />
+					<point x="147.5" y="2.5" z="86" />
+					<point x="119.9" y="1.3" z="120" />
+					<point x="84" y="0.5" z="145" />
+					<point x="41" y="-5" z="167" />
+					<point x="0.5" y="-4.7" z="170" />
+					<point x="-43" y="-4" z="162" />
+					<point x="-86" y="-3.5" z="146" />
+					<point x="-120" y="-2" z="120" />
+					<point x="-146.5" y="-1.8" z="80.6" />
+					<point x="-168" y="-0.75" z="44.9" />
+					<point x="-171" y="0" z="-2" />
+					<point x="-160" y="-0.3" z="-45" />
+					<point x="-156" y="0.4" z="-86" />
+					<point x="-115" y="1.0" z="-121" />
+					<point x="-80" y="0.89" z="-157" />
+					<point x="-45" y="2" z="-167.9" />
+					<point x="3" y="6" z="-172" />
+					<point x="45" y="-2" z="-160" />
+					<point x="89" y="-3" z="-149" />
+					<point x="131" y="0.9" z="-116" />
+					<point x="150" y="0.5" z="-87" />
+					<point x="168" y="0.69" z="-45" />
+					<point x="170" y="1" z="1.2" />
+				</translate>
+				<rotate time="30" x="0.35" y="0.21" z="0.7" />
+			</transform>
+			<models>
+				<model file="comet2.3d" />
+			</models>
+		</group>
+		<group>
+			<transform>
+				<translate time="11" align="False">
+					<point x="170" y="1" z="1.2" />
+					<point x="163" y="2" z="40" />
+					<point x="147.5" y="1.5" z="86" />
+					<point x="119.9" y="1.3" z="120" />
+					<point x="84" y="0.5" z="145" />
+					<point x="42" y="-5" z="167" />
+					<point x="0.5" y="-4.7" z="170" />
+					<point x="-43" y="-4" z="162" />
+					<point x="-86" y="-3.5" z="146" />
+					<point x="-120" y="-2" z="120" />
+					<point x="-146.5" y="-1.8" z="85.6" />
+					<point x="-168" y="-0.75" z="44.9" />
+					<point x="-171" y="0" z="2" />
+					<point x="-160" y="-0.3" z="-45" />
+					<point x="-146" y="0.4" z="-86" />
+					<point x="-119" y="1.6" z="-121" />
+					<point x="-80" y="0.89" z="-157" />
+					<point x="-45" y="2" z="-167" />
+					<point x="3" y="6" z="-172" />
+					<point x="45" y="-2" z="-160" />
+					<point x="87" y="-3" z="-149" />
+					<point x="121" y="0.9" z="-116" />
+					<point x="150" y="0.5" z="-87" />
+					<point x="168" y="0.69" z="-45" />
+				</translate>
+				<rotate time="30" x="0" y="0.2" z="0.5" />
+			</transform>
+			<models>
+				<model file="comet1.3d" />
+			</models>
+		</group>
+		<group>
+			<transform>
+				<translate time="9.4" align="False">
+					<point x="140.9" y="1.5" z="86" />
+					<point x="119.9" y="1.3" z="120" />
+					<point x="84" y="0" z="145" />
+					<point x="42" y="-5" z="167" />
+					<point x="0.5" y="-4.7" z="168" />
+					<point x="-43" y="-4" z="162" />
+					<point x="-86" y="-3.5" z="146" />
+					<point x="-120" y="-2.5" z="124" />
+					<point x="-146.5" y="-1.8" z="85.6" />
+					<point x="-160" y="0.75" z="44.9" />
+					<point x="-171" y="0" z="2" />
+					<point x="-160" y="-0.3" z="-45" />
+					<point x="-147" y="0.4" z="-86" />
+					<point x="-119" y="1.6" z="-121" />
+					<point x="-80" y="0.89" z="-157" />
+					<point x="-45" y="2" z="-168" />
+					<point x="3" y="6" z="-172" />
+					<point x="45" y="-2" z="-160" />
+					<point x="88" y="-3" z="-149" />
+					<point x="121" y="0.9" z="-116" />
+					<point x="150" y="0.5" z="-87" />
+					<point x="168" y="0.69" z="-45" />
+					<point x="170" y="1" z="1.2" />
+					<point x="163" y="2" z="42" />
+				</translate>
+				<rotate time="30" x="0.3" y="0.5" z="0.1" />
+			</transform>
+			<models>
+				<model file="comet3.3d" />
+			</models>
+		</group>
+		<group>
+			<transform>
+				<translate time="9.2" align="False">
+					<point x="119.9" y="1.3" z="120" />
+					<point x="84" y="0.5" z="145" />
+					<point x="42" y="-4" z="167" />
+					<point x="0.5" y="-4.7" z="170" />
+					<point x="-43" y="-4" z="162" />
+					<point x="-86" y="-3.5" z="146" />
+					<point x="-120" y="-2" z="120" />
+					<point x="-146.5" y="-1.8" z="85.6" />
+					<point x="-168" y="-0.75" z="45.9" />
+					<point x="-171" y="0" z="2" />
+					<point x="-160" y="-0.3" z="-45" />
+					<point x="-148" y="0.4" z="-86" />
+					<point x="-119" y="1.6" z="-121" />
+					<point x="-85" y="0.89" z="-157.6" />
+					<point x="-55" y="2" z="-167" />
+					<point x="4.0" y="6" z="-172" />
+					<point x="45" y="-2" z="-160" />
+					<point x="87" y="-3" z="-149" />
+					<point x="121" y="0.9" z="-126" />
+					<point x="150" y="0.5" z="-87" />
+					<point x="169" y="0.69" z="-45" />
+					<point x="170" y="1" z="1.2" />
+					<point x="163" y="2" z="40" />
+					<point x="147.5" y="1.5" z="86" />
+				</translate>
+				<rotate time="30" x="0.5" y="0.2" z="0.5" />
+			</transform>
+			<models>
+				<model file="comet4.3d" />
+			</models>
+		</group>
+ 	</group>
+</world>
