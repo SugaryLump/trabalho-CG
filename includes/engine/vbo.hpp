@@ -12,17 +12,33 @@
 #include <GL/glut.h>
 #endif
 
-class VBO {
-   private:
-    GLuint* vertexBufferIndex;
-    GLuint* indexBufferIndex;
-    GLuint* colorBufferIndex;
+void initBuffers(std::map<std::string, Model> modelTable);
+void initTextures(std::vector<std::string> textureNames);
 
+class Buffers {
+   public:
+    GLuint* coordBufferIndex;
+    GLuint* normalBufferIndex;
+    GLuint* textureBufferIndex;
+    GLuint* indexBufferIndex;
+    
     unsigned int indexCount;
 
+    Buffers() = default;
+    Buffers(Model model);
+};
+
+class VBO {
+   private:
+    Buffers* buffers;
+
+    unsigned int* textureIndex;
+
+    ColorData colorData;
+
    public:
-    VBO();
-    explicit VBO(Model model);
+    VBO() = default;
+    explicit VBO(ModelContainer model);
 
     void draw();
 };

@@ -2,9 +2,13 @@
 
 #include <cstdlib>
 #include <vector>
+#include <map>
+#include <unordered_set>
+#include <string>
 #include <math.h>
 
 #include "common/geometry.hpp"
+#include "engine/textures.hpp"
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
@@ -12,68 +16,97 @@
 #include <GL/glut.h>
 #endif
 
-VBO::VBO() {}
+static std::map<std::string, Buffers*> bufferTable;
+static std::map<std::string, unsigned int*> textureTable;
 
-VBO::VBO(Model model) {
-    colorBufferIndex = (GLuint*) malloc(sizeof(GLuint));
-    vertexBufferIndex = (GLuint*) malloc(sizeof(GLuint));
-    indexBufferIndex = (GLuint*) malloc(sizeof(GLuint));
+void initBuffers(std::map<std::string, Model> modelTable) {
+    std::map<std::string, Model>::iterator it = modelTable.begin();
 
-    // Generate colors
-    std::vector<float> colors;
-    float r = 0.3;
-    float g = 0.3;
-    float b = 1;
-    int colorSectionSize = model.vertices.size() / 18;
-    for (int c = 0; c < (int) model.vertices.size() / 3; c++) {
-        if (c < colorSectionSize) {
-            r += 0.7 / colorSectionSize;
-        } else if (c < 2 * colorSectionSize) {
-            b -= 0.7 / colorSectionSize;
-        } else if (c < 3 * colorSectionSize) {
-            g += 0.7 / colorSectionSize;
-        } else if (c < 4 * colorSectionSize) {
-            r -= 0.7 / colorSectionSize;
-        } else if (c < 5 * colorSectionSize) {
-            b += 0.7 / colorSectionSize;
-        } else {
-            g -= 0.7 / colorSectionSize;
-        }
-        colors.push_back(r);
-        colors.push_back(g);
-        colors.push_back(b);
+    while (it != modelTable.end()) {
+        bufferTable[it->first] = new Buffers(it->second);
     }
+}
 
-    glGenBuffers(1, colorBufferIndex);
-    glBindBuffer(GL_ARRAY_BUFFER, *colorBufferIndex);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * colors.size(), colors.data(), GL_STATIC_DRAW);
+void initTextures(std::unordered_set<std::string> textureNames) {
+    std::unordered_set<std::string>::iterator it = textureNames.begin();
 
-    glGenBuffers(1, vertexBufferIndex);
-    glBindBuffer(GL_ARRAY_BUFFER, *vertexBufferIndex);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * model.vertices.size(), model.vertices.data(), GL_STATIC_DRAW);
+    while (it != textureNames.end()) {
+        TextureData textureData = TextureData(it->data());
+
+        unsigned int* textureIndex = (unsigned int*)malloc(sizeof(unsigned int));
+
+        glGenTextures(1, textureIndex);
+        glBindTexture(GL_TEXTURE_2D, *textureIndex);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureData.width, textureData.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData.imageData);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        textureTable[it->data()] = textureIndex;
+    }
+}
+
+Buffers::Buffers(Model model) {
+    coordBufferIndex = (GLuint*)malloc(sizeof(GLuint));
+    normalBufferIndex = (GLuint*)malloc(sizeof(GLuint));
+    textureBufferIndex = (GLuint*)malloc(sizeof(GLuint));
+    indexBufferIndex = (GLuint*)malloc(sizeof(GLuint));
+
+    indexCount = model.indices.size();
+
+    glGenBuffers(1, coordBufferIndex);
+    glBindBuffer(GL_ARRAY_BUFFER, *coordBufferIndex);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * model.vCoords.size(), model.vCoords.data(), GL_STATIC_DRAW);
+
+    glGenBuffers(1, normalBufferIndex);
+    glBindBuffer(GL_ARRAY_BUFFER, *normalBufferIndex);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * model.vNormals.size(), model.vNormals.data(), GL_STATIC_DRAW);
+
+    glGenBuffers(1, textureBufferIndex);
+    glBindBuffer(GL_ARRAY_BUFFER, *textureBufferIndex);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * model.vTextureCoords.size(), model.vTextureCoords.data(), GL_STATIC_DRAW);
 
     glGenBuffers(1, indexBufferIndex);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *indexBufferIndex);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * model.indices.size(), model.indices.data(),
-                 GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * model.indices.size(), model.indices.data(), GL_STATIC_DRAW);
+}
 
-    indexCount = model.indices.size();
+VBO::VBO(ModelContainer model) {
+    this->buffers = bufferTable[model.modelName];
+    this->textureIndex = textureTable[model.textureName];
+    this->colorData = model.colorData;
 }
 
 void VBO::draw() {
-    glBindBuffer(GL_ARRAY_BUFFER, *vertexBufferIndex);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, colorData.getDiffuse());
+    glMaterialfv(GL_FRONT, GL_SPECULAR, colorData.getSpecular());
+    glMaterialfv(GL_FRONT, GL_EMISSION, colorData.getEmissive());
+    glMaterialfv(GL_FRONT, GL_AMBIENT, colorData.getAmbient());
+    glMaterialfv(GL_FRONT, GL_SHININESS, &(colorData.shininess));
+
+    glBindTexture(GL_TEXTURE_2D, *textureIndex);
+
+    glBindBuffer(GL_ARRAY_BUFFER, *(buffers->coordBufferIndex));
     glVertexPointer(3, GL_FLOAT, 0, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, *colorBufferIndex);
-    glColorPointer(3, GL_FLOAT, 0, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, *(buffers->normalBufferIndex));
+    glNormalPointer(GL_FLOAT, 0, 0);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *indexBufferIndex);
-    glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, *(buffers->textureBufferIndex));
+    glTexCoordPointer(2, GL_FLOAT, 0, 0);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *(buffers->indexBufferIndex));
+    glDrawElements(GL_TRIANGLES, buffers->indexCount, GL_UNSIGNED_INT, 0);
 }
 
 VBOGroup::VBOGroup(ModelGroup modelGroup) {
     transformations = modelGroup.transformations;
-    for (Model model : modelGroup.rootModels) {
+    for (ModelContainer model : modelGroup.rootModels) {
         rootVBOs.emplace_back(model);
     }
     for (ModelGroup childGroup : modelGroup.childModels) {

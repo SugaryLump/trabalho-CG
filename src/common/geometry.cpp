@@ -69,6 +69,13 @@ void Vector3::applyVector(Vector3 vector) {
     z += vector.z;
 }
 
+//Vertex
+Vertex::Vertex(Vector3 position, Vector3 normal, Vector3 texture) {
+    this->position = position;
+    this->normal = normal;
+    this->texture = texture;
+}
+
 //Transform
 Translate::Translate(Vector3 vector) {
     this->vector = vector;
@@ -228,13 +235,13 @@ Model::Model(const string& path) {
             case '\000':
                 break;
             case 'v': {
-                float n1, n2, n3;
+                float p1, p2, p3, n1, n2, n3, t1, t2;
                 // TODO: Ver queixa do clang-tidy
-                if (sscanf(line.c_str(), "v %f %f %f\n", &n1, &n2, &n3) != 3) {
+                if (sscanf(line.c_str(), "v %f %f %f %f %f %f %f %f\n", &p1, &p2, &p3, &n1, &n2, &n3, &t1, &t2) != 8) {
                     cerr << "Error reading line: " << line << endl;
                     break;
                 }
-                this->addVertex(Vector3(n1, n2, n3));
+                this->addVertex(Vector3(p1, p2, p3), Vector3(n1, n2, n3), Vector3(t1, t2, 0));
 
                 break;
             }
@@ -263,8 +270,10 @@ void Model::toFile(std::string const& path) {
     ofstream stream;
     stream.open(path);
     stream << "# Vertexes\n";
-    for (long unsigned int v = 0; v + 2 < vertices.size(); v += 3) {
-        stream << "v " << vertices[v] << " " << vertices[v + 1] << " " << vertices[v + 2] << "\n";
+    for (long unsigned int v = 0; v + 2 < vCoords.size(); v += 3) {
+        stream << "v " << vCoords[v] << " " << vCoords[v + 1] << " " << vCoords[v + 2];
+        stream << "v " << vNormals[v] << " " << vNormals[v + 1] << " " << vNormals[v + 2];
+        stream << vTextureCoords[v] << " " << vTextureCoords[v + 1] << "\n";
     }
 
     stream << "\n# Faces\n";
@@ -274,10 +283,17 @@ void Model::toFile(std::string const& path) {
     stream.close();
 }
 
-void Model::addVertex(Vector3 vertex) {
-    vertices.push_back(vertex.x);
-    vertices.push_back(vertex.y);
-    vertices.push_back(vertex.z);
+void Model::addVertex(Vector3 pos, Vector3 normal, Vector3 texCoords) {
+    vCoords.push_back(pos.x);
+    vCoords.push_back(pos.y);
+    vCoords.push_back(pos.z);
+
+    vNormals.push_back(normal.x);
+    vNormals.push_back(normal.y);
+    vNormals.push_back(normal.z);
+
+    vTextureCoords.push_back(texCoords.x);
+    vTextureCoords.push_back(texCoords.y);
 }
 
 void Model::addFace(unsigned int v1, unsigned int v2, unsigned int v3) {
@@ -754,8 +770,62 @@ Model Model::generateComet(float radius, int randomness, int tessellation) {
     return Model::generateBezierPatch(patchData, tessellation);
 }
 
-ModelGroup::ModelGroup(std::vector<Model> models, std::vector<std::shared_ptr<Transform>> transforms) {
-    rootModels = models;
+ColorData::ColorData(Vector3 diffuse = Vector3(0, 0, 0), Vector3 specular = Vector3(0, 0, 0), Vector3 emissive = Vector3(0, 0, 0), Vector3 ambient = Vector3(0, 0, 0), float shininess = 0) {
+    this->diffuse = diffuse;
+    this->specular = specular;
+    this->emissive = emissive;
+    this->ambient = ambient;
+    this->shininess = shininess;
+}
+
+float* ColorData::getDiffuse() {
+    float param[4];
+    param[0] = diffuse.x;
+    param[1] = diffuse.y;
+    param[2] = diffuse.z;
+    param[3] = 1.0f;
+
+    return param;
+}
+
+float* ColorData::getSpecular() {
+    float param[4];
+    param[0] = specular.x;
+    param[1] = specular.y;
+    param[2] = specular.z;
+    param[3] = 1.0f;
+
+    return param;
+}
+
+float* ColorData::getEmissive() {
+    float param[4];
+    param[0] = emissive.x;
+    param[1] = emissive.y;
+    param[2] = emissive.z;
+    param[3] = 1.0f;
+
+    return param;
+}
+
+float* ColorData::getAmbient() {
+    float param[4];
+    param[0] = ambient.x;
+    param[1] = ambient.y;
+    param[2] = ambient.z;
+    param[3] = 1.0f;
+
+    return param;
+}
+
+ModelContainer::ModelContainer(std::string modelName, std::string textureName = "", ColorData colorData = ColorData()) {
+    this->modelName = modelName;
+    this->textureName = textureName;
+    this->colorData = colorData;
+}
+
+ModelGroup::ModelGroup(std::vector<ModelContainer> rootModels, std::vector<std::shared_ptr<Transform>> transforms) {
+    this->rootModels = rootModels;
     transformations = transforms;
 }
 

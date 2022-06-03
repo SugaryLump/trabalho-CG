@@ -6,6 +6,7 @@
 #include "engine/camera.hpp"
 #include "engine/input.hpp"
 #include "engine/vbo.hpp"
+#include "engine/light.hpp"
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <stdio.h>
@@ -32,6 +33,8 @@ static int windowWidth = 800;
 static int windowHeight = 800;
 static bool mouseWarping = false;
 static int timeBase, startTime;
+
+static std::vector<LightSource> lights;
 
 void changeSize(int w, int h) {
     windowWidth = w;
@@ -60,16 +63,6 @@ void renderScene() {
     // set camera
     glLoadIdentity();
 
-    // std::cout << "position\n " << camera.position.x << "\n"
-    //           << camera.position.y << "\n"
-    //           << camera.position.z << "\n"
-    //           << camera.look.x << "\n"
-    //           << camera.look.y << "\n"
-    //           << camera.look.z << "\n"
-    //           << camera.up.x << "\n"
-    //           << camera.up.y << "\n"
-    //           << camera.up.z << "\n";
-
     gluLookAt(camera->position.x, camera->position.y, camera->position.z, camera->look.x, camera->look.y,
               camera->look.z, camera->up.x, camera->up.y, camera->up.z);
 
@@ -91,7 +84,13 @@ void renderScene() {
         glEnd();
     }
 
+
+
     glScalef(SCALE, SCALE, SCALE);
+
+    for (int i = 0; i < lights.size(); i++) {
+        lights[i].setupLight(i);
+    }
 
     glPolygonMode(GL_FRONT_AND_BACK, line);
 
@@ -172,6 +171,7 @@ void update() {
 
 void render(int argc, char **argv, Config &config) {
     camera = std::move(config.camera);
+    lights = config.lights;
     input = std::make_unique<InputState>();
 
     // put GLUT init here
@@ -205,9 +205,15 @@ void render(int argc, char **argv, Config &config) {
     glEnable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_LIGHTING);
+    for (int i = 0; i < config.lights.size(); i++) {
+        glEnable(0x4000 + i * 0x0001);
+    }
     glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
-    glShadeModel(GL_FLAT);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
     // enter GLUTs main cycle
     glutMainLoop();

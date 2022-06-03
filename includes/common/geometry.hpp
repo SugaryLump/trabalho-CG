@@ -4,6 +4,7 @@
 #include <tuple>
 #include <vector>
 #include <memory>
+#include <map>
 
 void buildRotationMatrix(float* x, float* y, float* z, float* matrix);
 void normalizeVector(float* vector);
@@ -21,6 +22,16 @@ class Vector3 {
 
     static Vector3 fromSpherical(float alpha, float beta, float radius);
     void applyVector(Vector3 vector);
+};
+
+class Vertex {
+   public:
+    Vector3 position;
+    Vector3 normal;
+    Vector3 texture;
+
+    Vertex() = default;
+    Vertex(Vector3 position, Vector3 normal, Vector3 texture);
 };
 
 class Transform {
@@ -108,7 +119,9 @@ class PatchData {
 
 class Model {
    public:
-    std::vector<float> vertices;
+    std::vector<float> vCoords;
+    std::vector<float> vTextureCoords;
+    std::vector<float> vNormals;
     std::vector<unsigned int> indices;
 
     /**
@@ -122,7 +135,7 @@ class Model {
     explicit Model(std::string const &path);
 
     void toFile(std::string const &path);
-    void addVertex(Vector3 vertex);
+    void addVertex(Vector3 pos,Vector3 normal, Vector3 texCoords);
     void addFace(unsigned int v1, unsigned int v2, unsigned int v3);
     static Model generatePlane(float length, int subdivisions);
     static Model generateBox(float length, int subdivisions);
@@ -134,17 +147,43 @@ class Model {
     static Model generateComet(float radius, int randomness, int tessellation);
 };
 
+class ColorData {
+   public:
+    Vector3 diffuse;
+    Vector3 specular;
+    Vector3 emissive;
+    Vector3 ambient;
+    float shininess;
+
+    ColorData(Vector3 diffuse = Vector3(0, 0, 0), Vector3 specular = Vector3(0, 0, 0), Vector3 emissive = Vector3(0, 0, 0), Vector3 ambient = Vector3(0, 0, 0), float shininess = 0);
+
+    float* getDiffuse();
+    float* getSpecular();
+    float* getEmissive();
+    float* getAmbient();
+};
+
+class ModelContainer {
+   public:
+    std::string modelName;
+    std::string textureName;
+    ColorData colorData;
+
+    ModelContainer() = default;
+    ModelContainer(std::string modelName, std::string textureName = "", ColorData colorData = ColorData());
+};
+
 class ModelGroup {
    public:
     std::vector<std::shared_ptr<Transform>> transformations;
-    std::vector<Model> rootModels;
+    std::vector<ModelContainer> rootModels;
     std::vector<ModelGroup> childModels;
 
     /**
      * @brief Cria um grupos de modelos vazio
      */
     ModelGroup() = default;
-    ModelGroup(std::vector<Model> models, std::vector<std::shared_ptr<Transform>> transforms);
+    ModelGroup(std::vector<ModelContainer> rootModels, std::vector<std::shared_ptr<Transform>> transforms);
 
     void addChildGroup(ModelGroup childGroup);
 };
