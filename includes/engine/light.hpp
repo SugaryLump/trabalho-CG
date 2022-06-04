@@ -8,7 +8,7 @@ class LightSource {
     virtual void setupLight(int index) {}
 };
 
-class PointLight:LightSource {
+class PointLight:public LightSource {
    public:
     Vector3 position;
 
@@ -16,7 +16,7 @@ class PointLight:LightSource {
     void setupLight(int index) override;
 };
 
-class DirectionalLight:LightSource {
+class DirectionalLight:public LightSource {
    public:
     Vector3 direction;
 
@@ -24,7 +24,7 @@ class DirectionalLight:LightSource {
     void setupLight(int index) override;
 };
 
-class Spotlight:LightSource {
+class Spotlight:public LightSource {
    public:
     Vector3 position;
     Vector3 direction;

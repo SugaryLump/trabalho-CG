@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <memory>
 #include <vector>
+#include <map>
+#include <unordered_set>
 
 #include "common/geometry.hpp"
 #ifdef __APPLE__
@@ -13,7 +15,7 @@
 #endif
 
 void initBuffers(std::map<std::string, Model> modelTable);
-void initTextures(std::vector<std::string> textureNames);
+void initTextures(std::unordered_set<std::string> textureNames);
 
 class Buffers {
    public:

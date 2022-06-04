@@ -1,6 +1,8 @@
 #include "engine/xmlParser.hpp"
 
 #include <fmt/core.h>
+#include "engine/light.hpp"
+#include "engine/config.hpp"
 
 #include <iostream>
 #include <memory>
@@ -8,8 +10,10 @@
 #include <pugixml.hpp>
 using namespace std;
 
-namespace Parser {
+map<string, Model> modelTable;
+unordered_set<string> textureNames;
 
+namespace Parser {
 std::unique_ptr<Camera> parseCamera(pugi::xml_node node) noexcept {
     pugi::xml_node pos = node.child("position");
 
@@ -100,11 +104,56 @@ ModelGroup parseModel(pugi::xml_node node) noexcept {
                 }
             }
         } else if (name == "models") {
-            for (pugi::xml_node node_models : node_models) {
-                string name = node_models.name();
+            for (pugi::xml_node node : node_models) {
+                string name = node.name();
                 if (name == "model") {
-                    const char* filename = node_models.attribute("file").value();
-                    model_group.rootModels.emplace_back(filename);
+                    std::string modelName = node.attribute("file").value();
+                    if (modelTable.find(modelName) == modelTable.end()) {
+                        Model modelObject = Model(modelName);
+                        modelTable[modelName] = modelObject;
+                    }
+                    ColorData colorData = ColorData();
+                    std::string textureName = "";
+
+                    for (pugi::xml_node modelNode: node) {
+                        string name = modelNode.name();
+                        if (name == "texture") {
+                            textureName = node.attribute("file").value();
+                            if (textureNames.find(textureName) == textureNames.end()) {
+                                textureNames.insert(textureName);
+                            }
+                        }
+                        else if (name == "color") {
+
+                            for (pugi::xml_node colorNode : modelNode) {
+                                string name = colorNode.name();
+                                if (name != "shininess") {
+                                    float cr = stof(node.attribute("R").value());
+                                    float cg = stof(node.attribute("G").value());
+                                    float cb = stof(node.attribute("B").value());
+                                    Vector3 cv = Vector3(cr, cg, cb);
+                                    if (name == "diffuse") {
+                                        colorData.diffuse = cv;
+                                    }
+                                    else if (name == "ambient") {
+                                        colorData.ambient = cv;
+                                    }
+                                    else if (name == "specular") {
+                                        colorData.specular = cv;
+                                    }
+                                    else if (name == "emissive") {
+                                        colorData.emissive = cv;
+                                    }
+                                }
+                                else {
+                                    colorData.shininess = stof(node.attribute("shininess").value());
+                                }
+                            }
+                        }
+                    }
+
+                    ModelContainer model = ModelContainer(modelName, textureName, colorData);
+                    model_group.rootModels.push_back(model);
                 }
             }
         } else if (name == "group") {
@@ -114,13 +163,40 @@ ModelGroup parseModel(pugi::xml_node node) noexcept {
     return model_group;
 }
 
-std::vector<ModelGroup> parseModels(pugi::xml_node node) noexcept {
-    std::vector<ModelGroup> models;
-    models.push_back(parseModel(node));
-    return models;
+LightSource parseLight(pugi::xml_node node) noexcept {
+    LightSource light;
+
+    std::string type = node.attribute("type").value();
+    if (type == "point") {
+        float posx, posy, posz;
+        posx = stof(node.attribute("posX").value());
+        posy = stof(node.attribute("posY").value());
+        posz = stof(node.attribute("posZ").value());
+        light = PointLight(Vector3(posx, posy, posz));
+    }
+    else if (type == "directional") {
+        float dirx, diry, dirz;
+        dirx = stof(node.attribute("dirX").value());
+        diry = stof(node.attribute("dirY").value());
+        dirz = stof(node.attribute("dirZ").value());
+        light = DirectionalLight(Vector3(dirx, diry, dirz));
+    }
+    else if (type == "spotlight") {
+        float posx, posy, posz, dirx, diry, dirz, cutoff;
+        posx = stof(node.attribute("posX").value());
+        posy = stof(node.attribute("posY").value());
+        posz = stof(node.attribute("posZ").value());
+        dirx = stof(node.attribute("dirX").value());
+        diry = stof(node.attribute("dirY").value());
+        dirz = stof(node.attribute("dirZ").value());
+        cutoff = stof(node.attribute("cutoff").value());
+        light = Spotlight(Vector3(posx, posy, posz), Vector3(dirx, diry, dirz), cutoff);
+    }
+
+    return light;
 }
 
-std::optional<Config> parser(const std::string& filename) noexcept {
+optional<Config> parser(const std::string& filename) noexcept {
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(filename.c_str());
     std::vector<ModelGroup> models;
@@ -136,10 +212,14 @@ std::optional<Config> parser(const std::string& filename) noexcept {
         if (name == "camera") {
             c.camera = parseCamera(node);
         } else if (name == "group") {
-            //c.models = parseModels(node);
             c.models.push_back(parseModel(node));
+        } else if (name == "light") {
+            c.lights.push_back(parseLight(node));
         }
     }
+    c.modelTable = modelTable;
+    c.textureNames = textureNames;
+
     return c;
 }
 }  // namespace Parser

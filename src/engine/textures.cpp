@@ -7,7 +7,7 @@ void initIL() {
     ilInit();
 }
 
-Texture::Texture(std::string textureName) {
+TextureData::TextureData(std::string textureName) {
     unsigned int image;
 
     ilGenImages(1, &image);

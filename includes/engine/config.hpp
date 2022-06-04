@@ -7,12 +7,13 @@
 #include "engine/camera.hpp"
 #include "engine/light.hpp"
 
-struct Config {
+class Config {
+   public:
     std::unique_ptr<Camera> camera;
     std::vector<ModelGroup> models;
     std::map<std::string, Model> modelTable;
     std::unordered_set<std::string> textureNames;
     std::vector<LightSource> lights;
 
-    Config();
+    Config() = default;
 };

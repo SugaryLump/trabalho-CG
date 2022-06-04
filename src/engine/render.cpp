@@ -88,7 +88,7 @@ void renderScene() {
 
     glScalef(SCALE, SCALE, SCALE);
 
-    for (int i = 0; i < lights.size(); i++) {
+    for (int i = 0; i < (int)lights.size(); i++) {
         lights[i].setupLight(i);
     }
 
@@ -197,7 +197,10 @@ void render(int argc, char **argv, Config &config) {
 
     // put GLEW and VBO init here
     glewInit();
-    // TODO: Implement with ModelGroups
+    
+    //Initialize VBOs
+    initBuffers(config.modelTable);
+    initTextures(config.textureNames);
     vboController = std::make_unique<VBOController>(config.models);
 
     // some OpenGL settings
@@ -207,7 +210,7 @@ void render(int argc, char **argv, Config &config) {
     glEnable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_LIGHTING);
-    for (int i = 0; i < config.lights.size(); i++) {
+    for (int i = 0; i < (int)config.lights.size(); i++) {
         glEnable(0x4000 + i * 0x0001);
     }
     glEnableClientState(GL_VERTEX_ARRAY);

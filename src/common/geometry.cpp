@@ -523,7 +523,6 @@ Model Model::generateCone(float radius, float height, int slices, int stacks) {
         v3 = v2 + 1;
         cone.addFace(v1, v3, v2);
 
-        int v1, v2, v3;
         v1 = (slices + 1) * stacks + 1;
         v2 = v1 - slices - 1;
         v3 = v2 + 1;
@@ -536,7 +535,7 @@ Model Model::generateCone(float radius, float height, int slices, int stacks) {
             int v1, v2, v3, v4;
             v1 = 1 + st * (slices + 1) + sl;
             v2 = v1 + 1;
-            v3 + v1 + slices + 1;
+            v3 = v1 + slices + 1;
             v4 = v3 + 1;
             cone.addFace(v1, v2, v3);
             cone.addFace(v2, v4, v3);
@@ -547,7 +546,7 @@ Model Model::generateCone(float radius, float height, int slices, int stacks) {
 }
 
 Model Model::generateTorus(float radius, float tubeRadius, int tSlices, int pSlices) {
-    Model torus = Model();
+    Model torus = Model();/*
 
     // Vertexes
     for (int ps = 0; ps < pSlices; ps++) {
@@ -589,12 +588,12 @@ Model Model::generateTorus(float radius, float tubeRadius, int tSlices, int pSli
             torus.addFace(v1, v4, v3);
             torus.addFace(v1, v2, v4);
         }
-    }
+    }*/
     return torus;
 }
 
 Model Model::generateCylinder(float bRadius, float tRadius, float height, int slices, int stacks) {
-    Model cylinder = Model();
+    Model cylinder = Model();/*
 
     float sliceAngle = 2 * M_PI / slices;
 
@@ -645,7 +644,7 @@ Model Model::generateCylinder(float bRadius, float tRadius, float height, int sl
             cylinder.addFace(v0, v1, v2);
             cylinder.addFace(v1, v3, v2);
         }
-    }
+    }*/
 
     return cylinder;
 }
@@ -666,24 +665,45 @@ Model Model::generateBezierPatch(PatchData patchData, int tessellation) {
                 float v = 1.0f / tessellation * vdiv;
                 float um[4] = {powf(u, 3), powf(u, 2), u, 1};
                 float vm[4] = {powf(v, 3), powf(v, 2), v, 1};
+                float udm[4] = {3 * powf(u, 2), 2 * u, 1, 0};
+                float vdm[4] = {3 * powf(v, 2), 2 * v, 1, 0};
 
-                float point[3];
+                float point[3], derivu[3], derivv[3];
                 for (int c = 0; c < 3; c++) {
                     vector<int> inds = patchData.patchesIndices[pi];
                     float p[16] = { patchData.points[inds[0]][c], patchData.points[inds[1]][c], patchData.points[inds[2]][c], patchData.points[inds[3]][c],
                                     patchData.points[inds[4]][c], patchData.points[inds[5]][c], patchData.points[inds[6]][c], patchData.points[inds[7]][c],
                                     patchData.points[inds[8]][c], patchData.points[inds[9]][c], patchData.points[inds[10]][c], patchData.points[inds[11]][c],
                                     patchData.points[inds[12]][c], patchData.points[inds[13]][c], patchData.points[inds[14]][c], patchData.points[inds[15]][c]};
+                    float result, resultdu, resultdv;
+                    //Point
                     float tmp1[4], tmp2[4], tmp3[4];
-                    float result;
                     multiplyMatrixes(um, 4, 1, m, 4, tmp1);
                     multiplyMatrixes(tmp1, 4, 1, p, 4, tmp2);
                     multiplyMatrixes(tmp2, 4, 1, m, 4, tmp3);
                     multiplyMatrixes(tmp3, 4, 1, vm, 1, &result);
                     point[c] = result;
+                    //Tangent vector (u)
+                    float tmpdu1[4], tmpdu2[4], tmpdu3[4];
+                    multiplyMatrixes(udm, 4, 1, m, 4, tmpdu1);
+                    multiplyMatrixes(tmpdu1, 4, 1, p, 4, tmpdu2);
+                    multiplyMatrixes(tmpdu2, 4, 1, m, 4, tmpdu3);
+                    multiplyMatrixes(tmpdu3, 4, 1, vm, 1, &resultdu);
+                    derivu[c] = resultdu;
+                    //Tangent vector (v)
+                    multiplyMatrixes(tmp3, 4, 1, vdm, 1, &resultdv);
+                    derivv[c] = resultdv;
                 }
+                //Normal vector
+                float normal[3];
+                crossVectors(derivu, derivv, normal);
+                normalizeVector(normal);
+                Vector3 normalVector = Vector3(normal[0], normal[1], normal[2]);
+                int tx = 1.0f / tessellation * u;
+                int ty = 1.0f / tessellation * v;
+                Vector3 texVector = Vector3(tx, ty, 0);
 
-                patch.addVertex(Vector3(point[0], point[1], point[2]));
+                patch.addVertex(Vector3(point[0], point[1], point[2]), normalVector, texVector);
             }
         }
 
@@ -760,7 +780,7 @@ Model Model::generateComet(float radius, int randomness, int tessellation) {
     return Model::generateBezierPatch(patchData, tessellation);
 }
 
-ColorData::ColorData(Vector3 diffuse = Vector3(0, 0, 0), Vector3 specular = Vector3(0, 0, 0), Vector3 emissive = Vector3(0, 0, 0), Vector3 ambient = Vector3(0, 0, 0), float shininess = 0) {
+ColorData::ColorData(Vector3 diffuse, Vector3 specular, Vector3 emissive, Vector3 ambient, float shininess) {
     this->diffuse = diffuse;
     this->specular = specular;
     this->emissive = emissive;
@@ -769,7 +789,7 @@ ColorData::ColorData(Vector3 diffuse = Vector3(0, 0, 0), Vector3 specular = Vect
 }
 
 float* ColorData::getDiffuse() {
-    float param[4];
+    float* param = (float*)malloc(sizeof(float) * 4);
     param[0] = diffuse.x;
     param[1] = diffuse.y;
     param[2] = diffuse.z;
@@ -779,7 +799,7 @@ float* ColorData::getDiffuse() {
 }
 
 float* ColorData::getSpecular() {
-    float param[4];
+    float* param = (float*)malloc(sizeof(float) * 4);
     param[0] = specular.x;
     param[1] = specular.y;
     param[2] = specular.z;
@@ -789,7 +809,7 @@ float* ColorData::getSpecular() {
 }
 
 float* ColorData::getEmissive() {
-    float param[4];
+    float* param = (float*)malloc(sizeof(float) * 4);
     param[0] = emissive.x;
     param[1] = emissive.y;
     param[2] = emissive.z;
@@ -799,7 +819,7 @@ float* ColorData::getEmissive() {
 }
 
 float* ColorData::getAmbient() {
-    float param[4];
+    float* param = (float*)malloc(sizeof(float) * 4);
     param[0] = ambient.x;
     param[1] = ambient.y;
     param[2] = ambient.z;
@@ -808,7 +828,7 @@ float* ColorData::getAmbient() {
     return param;
 }
 
-ModelContainer::ModelContainer(std::string modelName, std::string textureName = "", ColorData colorData = ColorData()) {
+ModelContainer::ModelContainer(std::string modelName, std::string textureName, ColorData colorData) {
     this->modelName = modelName;
     this->textureName = textureName;
     this->colorData = colorData;

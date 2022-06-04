@@ -50,4 +50,5 @@ void Spotlight::setupLight(int index) {
     dir[1] = direction.y;
     dir[2] = direction.z;
     glLightfv(0x4000 + 0x0001 * index, GL_SPOT_DIRECTION, dir);
+    glLightfv(0x4000 + 0x0001 * index, GL_SPOT_CUTOFF, &cutoff);
 }
