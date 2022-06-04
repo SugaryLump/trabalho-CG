@@ -187,6 +187,3 @@ class ModelGroup {
 
     void addChildGroup(ModelGroup childGroup);
 };
-
-int calcBoxInnerVertexes(int x, int y, int z, int subdivisions);
-int calcBoxVertexIndex(int x, int y, int z, int subdivisions);
