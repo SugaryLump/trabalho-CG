@@ -128,9 +128,9 @@ ModelGroup parseModel(pugi::xml_node node) noexcept {
                             for (pugi::xml_node colorNode : modelNode) {
                                 string name = colorNode.name();
                                 if (name != "shininess") {
-                                    float cr = stof(node.attribute("R").value());
-                                    float cg = stof(node.attribute("G").value());
-                                    float cb = stof(node.attribute("B").value());
+                                    float cr = stof(colorNode.attribute("R").value());
+                                    float cg = stof(colorNode.attribute("G").value());
+                                    float cb = stof(colorNode.attribute("B").value());
                                     Vector3 cv = Vector3(cr, cg, cb);
                                     if (name == "diffuse") {
                                         colorData.diffuse = cv;
@@ -146,7 +146,7 @@ ModelGroup parseModel(pugi::xml_node node) noexcept {
                                     }
                                 }
                                 else {
-                                    colorData.shininess = stof(node.attribute("shininess").value());
+                                    colorData.shininess = stof(colorNode.attribute("value").value());
                                 }
                             }
                         }
@@ -163,43 +163,48 @@ ModelGroup parseModel(pugi::xml_node node) noexcept {
     return model_group;
 }
 
-LightSource parseLight(pugi::xml_node node) noexcept {
-    LightSource light;
+vector<shared_ptr<LightSource>> parseLights(pugi::xml_node node) noexcept {
+    vector<shared_ptr<LightSource>> lights;
 
-    std::string type = node.attribute("type").value();
-    if (type == "point") {
-        float posx, posy, posz;
-        posx = stof(node.attribute("posX").value());
-        posy = stof(node.attribute("posY").value());
-        posz = stof(node.attribute("posZ").value());
-        light = PointLight(Vector3(posx, posy, posz));
-    }
-    else if (type == "directional") {
-        float dirx, diry, dirz;
-        dirx = stof(node.attribute("dirX").value());
-        diry = stof(node.attribute("dirY").value());
-        dirz = stof(node.attribute("dirZ").value());
-        light = DirectionalLight(Vector3(dirx, diry, dirz));
-    }
-    else if (type == "spotlight") {
-        float posx, posy, posz, dirx, diry, dirz, cutoff;
-        posx = stof(node.attribute("posX").value());
-        posy = stof(node.attribute("posY").value());
-        posz = stof(node.attribute("posZ").value());
-        dirx = stof(node.attribute("dirX").value());
-        diry = stof(node.attribute("dirY").value());
-        dirz = stof(node.attribute("dirZ").value());
-        cutoff = stof(node.attribute("cutoff").value());
-        light = Spotlight(Vector3(posx, posy, posz), Vector3(dirx, diry, dirz), cutoff);
+    for (pugi::xml_node lightNode : node) {
+        if ((string)lightNode.name() == "light") {
+            shared_ptr<LightSource> light;
+            string type = lightNode.attribute("type").value();
+            if (type == "point") {
+                float posx, posy, posz;
+                posx = stof(lightNode.attribute("posx").value());
+                posy = stof(lightNode.attribute("posy").value());
+                posz = stof(lightNode.attribute("posz").value());
+                light = make_shared<PointLight>(Vector3(posx, posy, posz));
+            }
+            else if (type == "directional") {
+                float dirx, diry, dirz;
+                dirx = stof(lightNode.attribute("dirx").value());
+                diry = stof(lightNode.attribute("diry").value());
+                dirz = stof(lightNode.attribute("dirz").value());
+                light = make_shared<DirectionalLight>(Vector3(dirx, diry, dirz));
+            }
+            else if (type == "spotlight") {
+                float posx, posy, posz, dirx, diry, dirz, cutoff;
+                posx = stof(lightNode.attribute("posx").value());
+                posy = stof(lightNode.attribute("posy").value());
+                posz = stof(lightNode.attribute("posz").value());
+                dirx = stof(lightNode.attribute("dirx").value());
+                diry = stof(lightNode.attribute("diry").value());
+                dirz = stof(lightNode.attribute("dirz").value());
+                cutoff = stof(lightNode.attribute("cutoff").value());
+                light = make_shared<Spotlight>(Vector3(posx, posy, posz), Vector3(dirx, diry, dirz), cutoff);
+            }
+            lights.push_back(light);
+        }
     }
 
-    return light;
+    return lights;
 }
 
 optional<Config> parser(const std::string& filename) noexcept {
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(filename.c_str());
-    std::vector<ModelGroup> models;
 
     if (!result) {
         fmt::print(stderr, "error: {}\n", result);
@@ -213,8 +218,8 @@ optional<Config> parser(const std::string& filename) noexcept {
             c.camera = parseCamera(node);
         } else if (name == "group") {
             c.models.push_back(parseModel(node));
-        } else if (name == "light") {
-            c.lights.push_back(parseLight(node));
+        } else if (name == "lights") {
+            c.lights = parseLights(node);
         }
     }
     c.modelTable = modelTable;

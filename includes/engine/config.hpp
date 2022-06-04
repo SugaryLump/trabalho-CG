@@ -13,7 +13,7 @@ class Config {
     std::vector<ModelGroup> models;
     std::map<std::string, Model> modelTable;
     std::unordered_set<std::string> textureNames;
-    std::vector<LightSource> lights;
+    std::vector<std::shared_ptr<LightSource>> lights;
 
     Config() = default;
 };

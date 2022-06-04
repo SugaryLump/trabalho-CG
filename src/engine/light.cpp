@@ -26,16 +26,17 @@ void PointLight::setupLight(int index) {
     param[0] = position.x;
     param[1] = position.y;
     param[2] = position.z;
-    param[3] = 0.0f;
+    param[3] = 1.0f;
     glLightfv(0x4000 + 0x0001 * index, GL_POSITION, param);
 }
 
 void DirectionalLight::setupLight(int index) {
-    float param[3];
+    float param[4];
     param[0] = direction.x;
     param[1] = direction.y;
     param[2] = direction.z;
-    glLightfv(0x4000 + 0x0001 * index, GL_SPOT_DIRECTION, param);
+    param[3] = 0.0f;
+    glLightfv(0x4000 + 0x0001 * index, GL_POSITION, param);
 }
 
 void Spotlight::setupLight(int index) {
@@ -43,7 +44,7 @@ void Spotlight::setupLight(int index) {
     pos[0] = position.x;
     pos[1] = position.y;
     pos[2] = position.z;
-    pos[3] = 0.0f;
+    pos[3] = 1.0f;
     glLightfv(0x4000 + 0x0001 * index, GL_POSITION, pos);
     float dir[3];
     dir[0] = direction.x;

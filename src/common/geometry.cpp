@@ -271,8 +271,8 @@ void Model::toFile(std::string const& path) {
     stream.open(path);
     stream << "# Vertexes\n";
     for (long unsigned int v = 0; v + 2 < vCoords.size(); v += 3) {
-        stream << "v " << vCoords[v] << " " << vCoords[v + 1] << " " << vCoords[v + 2];
-        stream << vNormals[v] << " " << vNormals[v + 1] << " " << vNormals[v + 2];
+        stream << "v " << vCoords[v] << " " << vCoords[v + 1] << " " << vCoords[v + 2] << " ";
+        stream << vNormals[v] << " " << vNormals[v + 1] << " " << vNormals[v + 2] << " ";
         stream << vTextureCoords[v] << " " << vTextureCoords[v + 1] << "\n";
     }
 
@@ -349,7 +349,7 @@ Model Model::generateBox(float length, int subdivisions) {
             Vector3 pos1 = Vector3(start + triangleSide * u,  start, start + triangleSide * v);
             Vector3 nor1 = Vector3(0, -1, 0);
             Vector3 tex1 = Vector3(texSide * u, texSide * v, 0);
-            box.addVertex(pos1, tex1, nor1);
+            box.addVertex(pos1, nor1, tex1);
 
             //Y+ (u = x, v = z)
             Vector3 pos2 = Vector3(start + triangleSide * u, -start, start + triangleSide * v);
@@ -407,32 +407,32 @@ Model Model::generateBox(float length, int subdivisions) {
             v2 = v1 + 6;
             v3 = v1 + (subdivisions + 1) * 6;
             v4 = v3 + 6;
-            box.addFace(v2, v1, v3);
-            box.addFace(v2, v3, v4);
+            box.addFace(v2, v3, v1);
+            box.addFace(v2, v4, v3);
 
             //Z+ (u = x, v = y)
             v1 = 3 + u * (subdivisions + 1) * 6 + 6 * v;
             v2 = v1 + 6;
             v3 = v1 + (subdivisions + 1) * 6;
             v4 = v3 + 6;
-            box.addFace(v2, v3, v1);
-            box.addFace(v2, v4, v3);
+            box.addFace(v2, v1, v3);
+            box.addFace(v2, v3, v4);
 
             //X- (u = y, v = z)
             v1 = 4 + u * (subdivisions + 1) * 6 + 6 * v;
             v2 = v1 + 6;
             v3 = v1 + (subdivisions + 1) * 6;
             v4 = v3 + 6;
-            box.addFace(v2, v1, v3);
-            box.addFace(v2, v3, v4);
+            box.addFace(v2, v3, v1);
+            box.addFace(v2, v4, v3);
 
             //X+ (u = y, v = z)
             v1 = 5 + u * (subdivisions + 1) * 6 + 6 * v;
             v2 = v1 + 6;
             v3 = v1 + (subdivisions + 1) * 6;
             v4 = v3 + 6;
-            box.addFace(v2, v3, v1);
-            box.addFace(v2, v4, v3);
+            box.addFace(v2, v1, v3);
+            box.addFace(v2, v3, v4);
         }
     }
 
@@ -790,9 +790,9 @@ ColorData::ColorData(Vector3 diffuse, Vector3 specular, Vector3 emissive, Vector
 
 float* ColorData::getDiffuse() {
     float* param = (float*)malloc(sizeof(float) * 4);
-    param[0] = diffuse.x;
-    param[1] = diffuse.y;
-    param[2] = diffuse.z;
+    param[0] = diffuse.x / 255.0f;
+    param[1] = diffuse.y / 255.0f;
+    param[2] = diffuse.z / 255.0f;
     param[3] = 1.0f;
 
     return param;
@@ -800,9 +800,9 @@ float* ColorData::getDiffuse() {
 
 float* ColorData::getSpecular() {
     float* param = (float*)malloc(sizeof(float) * 4);
-    param[0] = specular.x;
-    param[1] = specular.y;
-    param[2] = specular.z;
+    param[0] = specular.x / 255.0f;
+    param[1] = specular.y / 255.0f;
+    param[2] = specular.z / 255.0f;
     param[3] = 1.0f;
 
     return param;
@@ -810,9 +810,9 @@ float* ColorData::getSpecular() {
 
 float* ColorData::getEmissive() {
     float* param = (float*)malloc(sizeof(float) * 4);
-    param[0] = emissive.x;
-    param[1] = emissive.y;
-    param[2] = emissive.z;
+    param[0] = emissive.x / 255.0f;
+    param[1] = emissive.y / 255.0f;
+    param[2] = emissive.z / 255.0f;
     param[3] = 1.0f;
 
     return param;
@@ -820,9 +820,9 @@ float* ColorData::getEmissive() {
 
 float* ColorData::getAmbient() {
     float* param = (float*)malloc(sizeof(float) * 4);
-    param[0] = ambient.x;
-    param[1] = ambient.y;
-    param[2] = ambient.z;
+    param[0] = ambient.x / 255.0f;
+    param[1] = ambient.y / 255.0f;
+    param[2] = ambient.z / 255.0f;
     param[3] = 1.0f;
 
     return param;

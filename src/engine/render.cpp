@@ -1,6 +1,7 @@
 #include "engine/render.hpp"
 
 #include <cstdlib>
+#include <memory>
 
 #include "common/geometry.hpp"
 #include "engine/camera.hpp"
@@ -10,6 +11,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <stdio.h>
+#include <string>
 
 #include <iostream>
 
@@ -34,7 +36,7 @@ static int windowHeight = 800;
 static bool mouseWarping = false;
 static int timeBase, startTime;
 
-static std::vector<LightSource> lights;
+static std::vector<std::shared_ptr<LightSource>> lights;
 
 void changeSize(int w, int h) {
     windowWidth = w;
@@ -67,6 +69,7 @@ void renderScene() {
               camera->look.z, camera->up.x, camera->up.y, camera->up.z);
 
     if (SHOW_AXIS) {
+        glDisable(GL_LIGHTING);
         // Axis
         glBegin(GL_LINES);
         // X axis in red
@@ -82,6 +85,7 @@ void renderScene() {
         glVertex3f(0.0f, 0.0f, -100.0f);
         glVertex3f(0.0f, 0.0f, 100.0f);
         glEnd();
+        glEnable(GL_LIGHTING);
     }
 
 
@@ -89,7 +93,15 @@ void renderScene() {
     glScalef(SCALE, SCALE, SCALE);
 
     for (int i = 0; i < (int)lights.size(); i++) {
-        lights[i].setupLight(i);
+        if (PointLight* light = dynamic_cast<PointLight*>(lights[i].get())) {
+            light->setupLight(i);
+        }
+        else if (DirectionalLight* light = dynamic_cast<DirectionalLight*>(lights[i].get())) {
+            light->setupLight(i);
+        }
+        else if (Spotlight* light = dynamic_cast<Spotlight*>(lights[i].get())) {
+            light->setupLight(i);
+        }
     }
 
     glPolygonMode(GL_FRONT_AND_BACK, line);
@@ -197,26 +209,25 @@ void render(int argc, char **argv, Config &config) {
 
     // put GLEW and VBO init here
     glewInit();
-    
-    //Initialize VBOs
-    initBuffers(config.modelTable);
-    initTextures(config.textureNames);
-    vboController = std::make_unique<VBOController>(config.models);
 
     // some OpenGL settings
     glPolygonMode(GL_FRONT, GL_FILL);
-    glEnable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_LIGHTING);
-    for (int i = 0; i < (int)config.lights.size(); i++) {
+    for (int i = 0; i < (int)lights.size(); i++) {
         glEnable(0x4000 + i * 0x0001);
     }
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+    //Initialize VBOs
+    initBuffers(config.modelTable);
+    initTextures(config.textureNames);
+    vboController = std::make_unique<VBOController>(config.models);
 
     // enter GLUTs main cycle
     glutMainLoop();

@@ -24,6 +24,7 @@ void initBuffers(std::map<std::string, Model> modelTable) {
 
     while (it != modelTable.end()) {
         bufferTable[it->first] = new Buffers(it->second);
+        it++;
     }
 }
 
@@ -48,6 +49,7 @@ void initTextures(std::unordered_set<std::string> textureNames) {
         glGenerateMipmap(GL_TEXTURE_2D);
 
         textureTable[it->data()] = textureIndex;
+        it++;
     }
 }
 
@@ -83,13 +85,18 @@ VBO::VBO(ModelContainer model) {
 }
 
 void VBO::draw() {
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, colorData.getDiffuse());
-    glMaterialfv(GL_FRONT, GL_SPECULAR, colorData.getSpecular());
-    glMaterialfv(GL_FRONT, GL_EMISSION, colorData.getEmissive());
-    glMaterialfv(GL_FRONT, GL_AMBIENT, colorData.getAmbient());
-    glMaterialfv(GL_FRONT, GL_SHININESS, &(colorData.shininess));
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, colorData.getDiffuse());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, colorData.getSpecular());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, colorData.getEmissive());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, colorData.getAmbient());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, &(colorData.shininess));
 
-    glBindTexture(GL_TEXTURE_2D, *textureIndex);
+    if (textureIndex) {
+        glBindTexture(GL_TEXTURE_2D, *textureIndex);
+    }
+    else {
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, *(buffers->coordBufferIndex));
     glVertexPointer(3, GL_FLOAT, 0, 0);
