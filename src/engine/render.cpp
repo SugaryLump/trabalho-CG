@@ -92,7 +92,7 @@ void renderScene() {
 
     glScalef(SCALE, SCALE, SCALE);
 
-    for (int i = 0; i < (int)lights.size(); i++) {
+    for (int i = 0; i < (int) lights.size() && i < 8; i++) {
         if (PointLight* light = dynamic_cast<PointLight*>(lights[i].get())) {
             light->setupLight(i);
         }
@@ -223,7 +223,7 @@ void render(int argc, char **argv, Config &config) {
         lights.push_back(light);
     }
     else {
-        for (int i = 0; i < (int)lights.size(); i++) {
+        for (int i = 0; i < (int)lights.size() && i < 8; i++) {
             glEnable(0x4000 + i * 0x0001);
         }
     }
