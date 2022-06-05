@@ -12,7 +12,7 @@ TextureData::TextureData(std::string textureName) {
 
     ilGenImages(1, &image);
     ilBindImage(image);
-    ilLoadImage(textureName.c_str());
+    ilLoadImage((ILstring)textureName.c_str());
     width = ilGetInteger(IL_IMAGE_WIDTH);
     height = ilGetInteger(IL_IMAGE_HEIGHT);
     ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);

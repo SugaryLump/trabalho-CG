@@ -51,7 +51,7 @@ if (WIN32)
     endif (NOT EXISTS "${TOOLKITS_FOLDER}/devil/IL/il.h" OR NOT EXISTS "${TOOLKITS_FOLDER}/devil/devIL.lib")	
 
 
-    target_include_directories(engine PRIVATE ${TOOLKITS_FOLDER}/glut ${TOOLKITS_FOLDER}/glew)
+    target_include_directories(engine PRIVATE ${TOOLKITS_FOLDER}/glut ${TOOLKITS_FOLDER}/glew ${TOOLKITS_FOLDER}/devil)
     target_link_libraries(engine ${OPENGL_LIBRARIES}
             ${TOOLKITS_FOLDER}/glut/glut32.lib
             ${TOOLKITS_FOLDER}/glew/glew32.lib
