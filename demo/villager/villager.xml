@@ -10,7 +10,15 @@
             <translate x="0" y="1.1" z="0" />
         </transform>
         <models>
-            <model file="vil_head.3d" /> <!-- sphere 0.8 6 6 -->
+            <model file="vil_head.3d"> <!-- sphere 0.8 6 6 -->
+                <color>
+                    <emissive R="0" G="0" B="0" />
+                    <diffuse R="168" G="115" B="91" />
+                    <ambient R="168" G="115" B="91" />
+                    <specular R="0" G="0" B="0" />
+                    <shininess value="128" />
+                </color>
+            </model>
         </models>
         <group>
             <transform>
@@ -18,7 +26,15 @@
                 <rotate angle="-75" x="0" y="0" z="1" />
             </transform>
             <models>
-                <model file="vil_hornbase.3d" /> <!-- cylinder 0.33 0.22 0.7 6 6-->
+                <model file="vil_hornbase.3d"> <!-- cylinder 0.33 0.22 0.7 6 6-->
+                    <color>
+                        <emissive R="0" G="0" B="0" />
+                        <diffuse R="89" G="95" B="102" />
+                        <ambient R="89" G="95" B="102" />
+                        <specular R="0" G="0" B="0" />
+                        <shininess value="128" />
+                    </color>
+                </model>
             </models>
             <group>
                 <transform>
@@ -26,7 +42,15 @@
                     <rotate angle="35" x="0" y="0" z="1" />
                 </transform>
                 <models>
-                    <model file="vil_hornmid.3d" /> <!-- cylinder 0.23 0.11 0.4 6 6-->
+                    <model file="vil_hornmid.3d"> <!-- cylinder 0.23 0.11 0.4 6 6-->
+                        <color>
+                            <emissive R="0" G="0" B="0" />
+                            <diffuse R="89" G="95" B="102" />
+                            <ambient R="89" G="95" B="102" />
+                            <specular R="0" G="0" B="0" />
+                            <shininess value="128" />
+                        </color>
+                    </model>
                 </models>
                 <group>
                     <transform>
@@ -34,7 +58,15 @@
                         <translate x="0.1" y="0.1" z="0" />«
                     </transform>
                     <models>
-                        <model file="vil_horntip.3d" /> <!-- cone 0.12 0.33 6 2-->
+                        <model file="vil_horntip.3d"> <!-- cone 0.12 0.33 6 2-->
+                            <color>
+                                <emissive R="0" G="0" B="0" />
+                                <diffuse R="89" G="95" B="102" />
+                                <ambient R="89" G="95" B="102" />
+                                <specular R="0" G="0" B="0" />
+                                <shininess value="128" />
+                            </color>
+                        </model>
                     </models>
                 </group>
             </group>
@@ -45,7 +77,15 @@
                 <rotate angle="75" x="0" y="0" z="1" />
             </transform>
             <models>
-                <model file="vil_hornbase.3d" /> <!-- cylinder 0.33 0.22 0.7 6 6-->
+                <model file="vil_hornbase.3d"> <!-- cylinder 0.33 0.22 0.7 6 6-->
+                    <color>
+                        <emissive R="0" G="0" B="0" />
+                        <diffuse R="89" G="95" B="102" />
+                        <ambient R="89" G="95" B="102" />
+                        <specular R="0" G="0" B="0" />
+                        <shininess value="128" />
+                    </color>
+                </model>
             </models>
             <group>
                 <transform>
@@ -53,7 +93,15 @@
                     <rotate angle="-35" x="0" y="0" z="1" />
                 </transform>
                 <models>
-                    <model file="vil_hornmid.3d" />
+                    <model file="vil_hornmid.3d">
+                        <color>
+                            <emissive R="0" G="0" B="0" />
+                            <diffuse R="89" G="95" B="102" />
+                            <ambient R="89" G="95" B="102" />
+                            <specular R="0" G="0" B="0" />
+                            <shininess value="128" />
+                        </color>
+                    </model>
                 </models>
                 <group>
                     <transform>
@@ -61,7 +109,15 @@
                         <translate x="-0.1" y="0.1" z="0" />«
                     </transform>
                     <models>
-                        <model file="vil_horntip.3d" /> <!-- cone 0.12 0.33 6 2-->
+                        <model file="vil_horntip.3d"> <!-- cone 0.12 0.33 6 2-->
+                            <color>
+                                <emissive R="0" G="0" B="0" />
+                                <diffuse R="89" G="95" B="102" />
+                                <ambient R="89" G="95" B="102" />
+                                <specular R="0" G="0" B="0" />
+                                <shininess value="128" />
+                            </color>
+                        </model>
                     </models>
                 </group>
             </group>
@@ -69,7 +125,15 @@
     </group>
 	<group> 
   		<models> 
-            <model file="vil_body.3d" /> <!-- cylinder 0.9 0.5 1 6 6-->
+            <model file="vil_body.3d"> <!-- cylinder 0.9 0.5 1 6 6-->
+                <color>
+                    <emissive R="0" G="0" B="0" />
+                    <diffuse R="17" G="207" B="156" />
+                    <ambient R="17" G="207" B="156" />
+                    <specular R="0" G="0" B="0" />
+                    <shininess value="128" />
+                </color>
+            </model>
  		</models>
  	</group>
     <group>
@@ -82,21 +146,45 @@
                 <rotate angle="65" x="0" y="0" z="1" />
             </transform>
             <models>
-                <model file="vil_sleeve.3d" />
+                <model file="vil_sleeve.3d">
+                    <color>
+                        <emissive R="0" G="0" B="0" />
+                        <diffuse R="17" G="207" B="156" />
+                        <ambient R="17" G="207" B="156" />
+                        <specular R="0" G="0" B="0" />
+                        <shininess value="128" />
+                    </color>
+                </model>
             </models>
             <group>
                 <transform>
                     <translate x="0" y="-0.6" z="0" />
                 </transform>
                 <models>
-                    <model file="vil_arm.3d" />
+                    <model file="vil_arm.3d"> <!-- cylinder 0.15 0.15 0.6 4 4 -->
+                        <color>
+                            <emissive R="0" G="0" B="0" />
+                            <diffuse R="168" G="115" B="91" />
+                            <ambient R="168" G="115" B="91" />
+                            <specular R="0" G="0" B="0" />
+                            <shininess value="128" />
+                        </color>
+                    </model>
                 </models>
                 <group>
                     <transform>
                         <translate x="0" y="-0.45" z="0" />
                     </transform>
                     <models>
-                        <model file="vil_hand.3d" />
+                        <model file="vil_hand.3d">
+                            <color>
+                                <emissive R="0" G="0" B="0" />
+                                <diffuse R="168" G="115" B="91" />
+                                <ambient R="168" G="115" B="91" />
+                                <specular R="0" G="0" B="0" />
+                                <shininess value="128" />
+                            </color>
+                        </model>
                     </models>
                 </group>
             </group>
@@ -107,21 +195,45 @@
                 <rotate angle="-65" x="0" y="0" z="1" />
             </transform>
             <models>
-                <model file="vil_sleeve.3d" /> <!-- cylinder 0.3 0.25 0.8 6 6 -->
+                <model file="vil_sleeve.3d"> <!-- cylinder 0.3 0.25 0.8 6 6 -->
+                    <color>
+                        <emissive R="0" G="0" B="0" />
+                        <diffuse R="17" G="207" B="156" />
+                        <ambient R="17" G="207" B="156" />
+                        <specular R="0" G="0" B="0" />
+                        <shininess value="128" />
+                    </color>
+                </model>
             </models>
             <group>
                 <transform>
                     <translate x="0" y="-0.6" z="0" />
                 </transform>
                 <models>
-                    <model file="vil_arm.3d" /> <!-- cylinder 0.15 0.15 0.6 4 4 -->
+                    <model file="vil_arm.3d"> <!-- cylinder 0.15 0.15 0.6 4 4 -->
+                        <color>
+                            <emissive R="0" G="0" B="0" />
+                            <diffuse R="168" G="115" B="91" />
+                            <ambient R="168" G="115" B="91" />
+                            <specular R="0" G="0" B="0" />
+                            <shininess value="128" />
+                        </color>
+                    </model>
                 </models>
                 <group>
                     <transform>
                         <translate x="0" y="-0.45" z="0" />
                     </transform>
                     <models>
-                        <model file="vil_hand.3d" /> <!-- sphere 0.25 5 5-->
+                        <model file="vil_hand.3d"> <!-- sphere 0.25 5 5-->
+                            <color>
+                                <emissive R="0" G="0" B="0" />
+                                <diffuse R="168" G="115" B="91" />
+                                <ambient R="168" G="115" B="91" />
+                                <specular R="0" G="0" B="0" />
+                                <shininess value="128" />
+                            </color>
+                        </model>
                     </models>
                 </group>
             </group>
@@ -137,7 +249,15 @@
                 <rotate angle="-5" x="0" y="0" z="1" />
             </transform>
             <models>
-                <model file="vil_pant.3d" /> <!-- cylinder 0.5 0.45 0.5 5 5-->
+                <model file="vil_pant.3d"> <!-- cylinder 0.5 0.45 0.5 5 5-->
+                    <color>
+                        <emissive R="0" G="0" B="0" />
+                        <diffuse R="70" G="70" B="70" />
+                        <ambient R="70" G="70" B="70" />
+                        <specular R="0" G="0" B="0" />
+                        <shininess value="128" />
+                    </color>
+                </model>
             </models>
             <group>
                 <transform>
@@ -145,7 +265,15 @@
                     <translate x="-0.1" y="-0.5" z="0" />
                 </transform>
                 <models>
-                    <model file="vil_leg.3d" /> <!-- cylinder 0.175 0.175 0.9 5 5-->
+                    <model file="vil_leg.3d"> <!-- cylinder 0.175 0.175 0.9 5 5-->
+                        <color>
+                            <emissive R="0" G="0" B="0" />
+                            <diffuse R="0" G="150" B="73" />
+                            <ambient R="0" G="150" B="73" />
+                            <specular R="0" G="0" B="0" />
+                            <shininess value="128" />
+                        </color>
+                    </model>
                 </models>
                 <group>
                     <transform>
@@ -154,14 +282,30 @@
                         <rotate angle="45" x="0" y="1" z="0" />
                     </transform>
                     <models>
-                        <model file="vil_shoebase.3d" /> <!-- cylinder 0.175 0.25 0.4 4 4-->
+                        <model file="vil_shoebase.3d"> <!-- cylinder 0.175 0.25 0.4 4 4-->
+                            <color>
+                                <emissive R="0" G="0" B="0" />
+                                <diffuse R="17" G="207" B="156" />
+                                <ambient R="17" G="207" B="156" />
+                                <specular R="0" G="0" B="0" />
+                                <shininess value="128" />
+                            </color>
+                        </model>
                     </models>
                     <group>
                         <transform>
                             <translate x="0" y="0.2" z="0" />
                         </transform>
                         <models>
-                            <model file="vil_shoetip.3d" /> <!-- cone-->
+                            <model file="vil_shoetip.3d"> <!-- cone-->
+                                <color>
+                                    <emissive R="0" G="0" B="0" />
+                                    <diffuse R="17" G="207" B="156" />
+                                    <ambient R="17" G="207" B="156" />
+                                    <specular R="0" G="0" B="0" />
+                                    <shininess value="128" />
+                                </color>
+                            </model>
                         </models>
                     </group>
                 </group>
@@ -173,7 +317,15 @@
                 <rotate angle="5" x="0" y="0" z="1" />
             </transform>
             <models>
-                <model file="vil_pant.3d" />
+                <model file="vil_pant.3d">
+                    <color>
+                        <emissive R="0" G="0" B="0" />
+                        <diffuse R="70" G="70" B="70" />
+                        <ambient R="70" G="70" B="70" />
+                        <specular R="0" G="0" B="0" />
+                        <shininess value="128" />
+                    </color>
+                </model>
             </models>
             <group>
                 <transform>
@@ -181,7 +333,15 @@
                     <translate x="0.1" y="-0.5" z="0" />
                 </transform>
                 <models>
-                    <model file="vil_leg.3d" /> <!-- cylinder 0.175 0.175 0.9 5 5-->
+                    <model file="vil_leg.3d"> <!-- cylinder 0.175 0.175 0.9 5 5-->
+                        <color>
+                            <emissive R="0" G="0" B="0" />
+                            <diffuse R="0" G="150" B="73" />
+                            <ambient R="0" G="150" B="73" />
+                            <specular R="0" G="0" B="0" />
+                            <shininess value="128" />
+                        </color>
+                    </model>
                 </models>
                 <group>
                     <transform>
@@ -190,14 +350,30 @@
                         <rotate angle="45" x="0" y="1" z="0" />
                     </transform>
                     <models>
-                        <model file="vil_shoebase.3d" /> <!-- cylinder 0.175 0.25 0.4 4 4-->
+                        <model file="vil_shoebase.3d"> <!-- cylinder 0.175 0.25 0.4 4 4-->
+                            <color>
+                                <emissive R="0" G="0" B="0" />
+                                <diffuse R="17" G="207" B="156" />
+                                <ambient R="17" G="207" B="156" />
+                                <specular R="0" G="0" B="0" />
+                                <shininess value="128" />
+                            </color>
+                        </model>
                     </models>
                     <group>
                         <transform>
                             <translate x="0" y="0.2" z="0" />
                         </transform>
                         <models>
-                            <model file="vil_shoetip.3d" /> <!-- cone-->
+                            <model file="vil_shoetip.3d"> <!-- cone 0.25 0.35 4 4-->
+                                <color>
+                                    <emissive R="0" G="0" B="0" />
+                                    <diffuse R="17" G="207" B="156" />
+                                    <ambient R="17" G="207" B="156" />
+                                    <specular R="0" G="0" B="0" />
+                                    <shininess value="128" />
+                                </color>
+                            </model>
                         </models>
                     </group>
                 </group>

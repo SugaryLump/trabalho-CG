@@ -155,12 +155,13 @@ class ColorData {
     Vector3 ambient;
     float shininess;
 
-    ColorData(Vector3 diffuse = Vector3(204, 204, 204), Vector3 specular = Vector3(0, 0, 0), Vector3 emissive = Vector3(0, 0, 0), Vector3 ambient = Vector3(51, 51, 51), float shininess = 0);
+    ColorData(Vector3 diffuse = Vector3(0, 0, 0), Vector3 specular = Vector3(0, 0, 0), Vector3 emissive = Vector3(255, 255, 255), Vector3 ambient = Vector3(0, 0, 0), float shininess = 128);
 
     float* getDiffuse();
     float* getSpecular();
     float* getEmissive();
     float* getAmbient();
+    float* getShininess();
 };
 
 class ModelContainer {

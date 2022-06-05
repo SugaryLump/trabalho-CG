@@ -30,7 +30,7 @@ void initBuffers(std::map<std::string, Model> modelTable) {
 
 void initTextures(std::unordered_set<std::string> textureNames) {
     std::unordered_set<std::string>::iterator it = textureNames.begin();
-
+    initIL();
     while (it != textureNames.end()) {
         TextureData textureData = TextureData(it->data());
 
@@ -85,11 +85,11 @@ VBO::VBO(ModelContainer model) {
 }
 
 void VBO::draw() {
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, colorData.getDiffuse());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, colorData.getSpecular());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, colorData.getEmissive());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, colorData.getAmbient());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, &(colorData.shininess));
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, colorData.getDiffuse());
+    glMaterialfv(GL_FRONT, GL_SPECULAR, colorData.getSpecular());
+    glMaterialfv(GL_FRONT, GL_EMISSION, colorData.getEmissive());
+    glMaterialfv(GL_FRONT, GL_AMBIENT, colorData.getAmbient());
+    glMaterialfv(GL_FRONT, GL_SHININESS, colorData.getShininess());
 
     if (textureIndex) {
         glBindTexture(GL_TEXTURE_2D, *textureIndex);

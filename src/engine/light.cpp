@@ -21,6 +21,10 @@ Spotlight::Spotlight(Vector3 position, Vector3 direction, float cutoff) {
     this->cutoff = cutoff;
 }
 
+AmbientLight::AmbientLight(Vector3 intensity) {
+    this->intensity = intensity;
+}
+
 void PointLight::setupLight(int index) {
     float param[4];
     param[0] = position.x;
@@ -52,4 +56,13 @@ void Spotlight::setupLight(int index) {
     dir[2] = direction.z;
     glLightfv(0x4000 + 0x0001 * index, GL_SPOT_DIRECTION, dir);
     glLightfv(0x4000 + 0x0001 * index, GL_SPOT_CUTOFF, &cutoff);
+}
+
+void AmbientLight::setupLight(int index) {
+    float param[4];
+    param[0] = intensity.x;
+    param[1] = intensity.y;
+    param[2] = intensity.z;
+    param[3] = 1.0f;
+    glLightfv(0x4000 + 0x0001 * index, GL_AMBIENT, param);
 }

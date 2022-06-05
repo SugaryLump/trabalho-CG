@@ -33,3 +33,11 @@ class Spotlight:public LightSource {
     Spotlight(Vector3 position, Vector3 direction, float cutoff);
     void setupLight(int index) override;
 };
+
+class AmbientLight:public LightSource {
+   public:
+    Vector3 intensity;
+
+    AmbientLight(Vector3 intensity);
+    void setupLight(int index) override;
+};

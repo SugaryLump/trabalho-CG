@@ -118,7 +118,7 @@ ModelGroup parseModel(pugi::xml_node node) noexcept {
                     for (pugi::xml_node modelNode: node) {
                         string name = modelNode.name();
                         if (name == "texture") {
-                            textureName = node.attribute("file").value();
+                            textureName = modelNode.attribute("file").value();
                             if (textureNames.find(textureName) == textureNames.end()) {
                                 textureNames.insert(textureName);
                             }

@@ -216,8 +216,16 @@ void render(int argc, char **argv, Config &config) {
     glEnable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_LIGHTING);
-    for (int i = 0; i < (int)lights.size(); i++) {
-        glEnable(0x4000 + i * 0x0001);
+    glEnable(GL_NORMALIZE);
+    if ((int)lights.size() == 0) {
+        glEnable(GL_LIGHT0);
+        std::shared_ptr<AmbientLight> light = std::make_shared<AmbientLight>(Vector3(1,1,1));
+        lights.push_back(light);
+    }
+    else {
+        for (int i = 0; i < (int)lights.size(); i++) {
+            glEnable(0x4000 + i * 0x0001);
+        }
     }
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);

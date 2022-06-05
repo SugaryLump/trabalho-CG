@@ -270,10 +270,10 @@ void Model::toFile(std::string const& path) {
     ofstream stream;
     stream.open(path);
     stream << "# Vertexes\n";
-    for (long unsigned int v = 0; v + 2 < vCoords.size(); v += 3) {
-        stream << "v " << vCoords[v] << " " << vCoords[v + 1] << " " << vCoords[v + 2] << " ";
-        stream << vNormals[v] << " " << vNormals[v + 1] << " " << vNormals[v + 2] << " ";
-        stream << vTextureCoords[v] << " " << vTextureCoords[v + 1] << "\n";
+    for (long unsigned int v = 0; v < vCoords.size() / 3; v++) {
+        stream << "v " << vCoords[v*3] << " " << vCoords[v*3 + 1] << " " << vCoords[v*3 + 2] << " ";
+        stream << vNormals[v*3] << " " << vNormals[v*3 + 1] << " " << vNormals[v*3 + 2] << " ";
+        stream << vTextureCoords[v*2] << " " << vTextureCoords[v*2 + 1] << "\n";
     }
 
     stream << "\n# Faces\n";
@@ -348,37 +348,37 @@ Model Model::generateBox(float length, int subdivisions) {
             //Y- (u = x, v = z)
             Vector3 pos1 = Vector3(start + triangleSide * u,  start, start + triangleSide * v);
             Vector3 nor1 = Vector3(0, -1, 0);
-            Vector3 tex1 = Vector3(texSide * u, texSide * v, 0);
+            Vector3 tex1 = Vector3(texSide * u, 1.0f - texSide * v, 0);
             box.addVertex(pos1, nor1, tex1);
 
             //Y+ (u = x, v = z)
             Vector3 pos2 = Vector3(start + triangleSide * u, -start, start + triangleSide * v);
             Vector3 nor2 = Vector3(0, 1, 0);
-            Vector3 tex2 = Vector3(texSide * u, texSide * v, 0);
+            Vector3 tex2 = Vector3(texSide * u, 1.0f - texSide * v, 0);
             box.addVertex(pos2, nor2, tex2);
 
             //Z- (u = x, v = y)
             Vector3 pos3 = Vector3(start + triangleSide * u, start + triangleSide * v, start);
             Vector3 nor3 = Vector3(0, 0, -1);
-            Vector3 tex3 = Vector3(texSide * u, texSide * v, 0);
+            Vector3 tex3 = Vector3(1.0f - texSide * u, 1.0f - texSide * v, 0);
             box.addVertex(pos3, nor3, tex3);
 
             //Z+ (u = x, v = y)
             Vector3 pos4 = Vector3(start + triangleSide * u, start + triangleSide * v, -start);
             Vector3 nor4 = Vector3(0, 0, 1);
-            Vector3 tex4 = Vector3(texSide * u, texSide * v, 0);
+            Vector3 tex4 = Vector3(texSide * u, 1.0f - texSide * v, 0);
             box.addVertex(pos4, nor4, tex4);
 
             //X- (u = y, v = z)
             Vector3 pos5 = Vector3(start, start + triangleSide * u, start + triangleSide * v);
             Vector3 nor5 = Vector3(-1, 0, 0);
-            Vector3 tex5 = Vector3(texSide * u, texSide * v, 0);
+            Vector3 tex5 = Vector3(texSide * v, 1.0f - texSide * u, 0);
             box.addVertex(pos5, nor5, tex5);
 
             //X+ (u = y, v = z)
             Vector3 pos6 = Vector3(-start, start + triangleSide * u, start + triangleSide * v);
             Vector3 nor6 = Vector3(1, 0, 0);
-            Vector3 tex6 = Vector3(texSide * u, texSide * v, 0);
+            Vector3 tex6 = Vector3(1.0f - texSide * v, 1.0f - texSide * u, 0);
             box.addVertex(pos6, nor6, tex6);
         }
     }
@@ -451,7 +451,7 @@ Model Model::generateSphere(float radius, int slices, int stacks) {
             float beta = -M_PI_2 + st * M_PI / stacks;
             Vector3 pos = Vector3::fromSpherical(alpha, beta, radius);
             Vector3 nor = Vector3::fromSpherical(alpha, beta, 1);
-            Vector3 tex = Vector3(1.0f / slices * sl, 1.0f / stacks * st);
+            Vector3 tex = Vector3(1.0f / slices * sl, 1.0f - 1.0f / stacks * st, 0);
             sphere.addVertex(pos, nor, tex);
         }
     }
@@ -459,14 +459,14 @@ Model Model::generateSphere(float radius, int slices, int stacks) {
     // Bottom and top stacks;
     for (int sl = 0; sl < slices; sl++) {
         int v1, v2, v3;
-        v1 = (stacks + 1) * sl;
-        v2 = v1 + 1;
-        v3 = v2 + stacks + 1; 
+        v1 = sl;
+        v2 = v1 + slices + 1;
+        v3 = v2 + 1; 
         sphere.addFace(v1, v3, v2);
 
-        v1 = stacks + (stacks + 1) * sl;
-        v2 = v1 - 1;
-        v3 = v2 + stacks + 1;
+        v1 = stacks * (slices + 1) + sl;
+        v2 = v1 - slices - 1;
+        v3 = v2 + 1;
         sphere.addFace(v1, v2, v3);
     }
 
@@ -474,10 +474,10 @@ Model Model::generateSphere(float radius, int slices, int stacks) {
     for (int st = 1; st < stacks - 1; st++) {
         for (int sl = 0; sl < slices; sl++) {
             int v1, v2, v3, v4;
-            v1 = st + sl * (stacks + 1);
-            v2 = v1 + stacks + 1;
-            v3 = v1 + 1;
-            v4 = v3 + stacks + 1;
+            v1 = st * (slices + 1) + sl;
+            v2 = v1 + 1;
+            v3 = v1 + slices + 1;
+            v4 = v3 + 1;
             sphere.addFace(v1, v2, v3);
             sphere.addFace(v2, v4, v3);
         }
@@ -509,7 +509,7 @@ Model Model::generateCone(float radius, float height, int slices, int stacks) {
             pos.y = st * height / stacks;
             float normalAngle = atan(radius / height);
             Vector3 nor = Vector3::fromSpherical(sl * 2*M_PI / slices, normalAngle, 1);
-            Vector3 tex = Vector3(1.0f / slices * sl, 1.0f / stacks * st);
+            Vector3 tex = Vector3(1.0f / slices * sl, 1.0f - 1.0f / stacks * st, 0);
             cone.addVertex(pos, nor, tex);
         }
     }
@@ -523,14 +523,14 @@ Model Model::generateCone(float radius, float height, int slices, int stacks) {
         v3 = v2 + 1;
         cone.addFace(v1, v3, v2);
 
-        v1 = (slices + 1) * stacks + 1;
+        v1 = (slices + 1) * (stacks + 1) + 1 + sl;
         v2 = v1 - slices - 1;
         v3 = v2 + 1;
         cone.addFace(v1, v2, v3);
     }
 
     //Cone bottom
-    for (int st = 0; st < stacks - 1; st++) {
+    for (int st = 0; st < stacks; st++) {
         for (int sl = 0; sl < slices; sl++) {
             int v1, v2, v3, v4;
             v1 = 1 + st * (slices + 1) + sl;
@@ -546,17 +546,19 @@ Model Model::generateCone(float radius, float height, int slices, int stacks) {
 }
 
 Model Model::generateTorus(float radius, float tubeRadius, int tSlices, int pSlices) {
-    Model torus = Model();/*
+    Model torus = Model();
 
     // Vertexes
-    for (int ps = 0; ps < pSlices; ps++) {
+    for (int ps = 0; ps <= pSlices; ps++) {
         float alpha = ps * (2 * M_PI / pSlices);
         Vector3 tubeCenter = Vector3::fromSpherical(alpha, 0, radius);
-        for (int ts = 0; ts < tSlices; ts++) {
+        for (int ts = 0; ts <= tSlices; ts++) {
             float beta = ts * (2 * M_PI / tSlices);
-            Vector3 vertex = Vector3::fromSpherical(alpha, beta, tubeRadius);
-            vertex.applyVector(tubeCenter);
-            torus.addVertex(vertex);
+            Vector3 pos = Vector3::fromSpherical(alpha, beta, tubeRadius);
+            pos.applyVector(tubeCenter);
+            Vector3 nor = Vector3::fromSpherical(alpha, beta, 1);
+            Vector3 tex = Vector3(1.0f / pSlices * ps, 1.0f / tSlices * ts, 0);
+            torus.addVertex(pos, nor, tex);
         }
     }
 
@@ -564,36 +566,20 @@ Model Model::generateTorus(float radius, float tubeRadius, int tSlices, int pSli
     for (int ps = 0; ps < pSlices; ps++) {
         for (int ts = 0; ts < tSlices; ts++) {
             int v1, v2, v3, v4;
-            v1 = ps * tSlices + ts;
-            if (ps < pSlices - 1) {
-                v2 = v1 + tSlices;
-            } else {
-                v2 = ts;
-            }
-
-            if (ts < tSlices - 1) {
-                v3 = v1 + 1;
-            } else {
-                v3 = ps * tSlices;
-            }
-
-            if (ps < pSlices - 1) {
-                v4 = v3 + tSlices;
-            } else if (ts < tSlices - 1) {
-                v4 = v2 + 1;
-            } else {
-                v4 = 0;
-            }
+            v1 = ps * (tSlices + 1) + ts;
+            v2 = v1 + tSlices + 1;
+            v3 = v1 + 1;
+            v4 = v3 + tSlices + 1;
 
             torus.addFace(v1, v4, v3);
             torus.addFace(v1, v2, v4);
         }
-    }*/
+    }
     return torus;
 }
 
 Model Model::generateCylinder(float bRadius, float tRadius, float height, int slices, int stacks) {
-    Model cylinder = Model();/*
+    Model cylinder = Model();
 
     float sliceAngle = 2 * M_PI / slices;
 
@@ -601,50 +587,54 @@ Model Model::generateCylinder(float bRadius, float tRadius, float height, int sl
     //Base and top
     Vector3 baseCenter = Vector3(0, -height / 2, 0);
     Vector3 topCenter = Vector3(0, height / 2, 0);
-    cylinder.addVertex(baseCenter);
-    cylinder.addVertex(topCenter);
+    cylinder.addVertex(baseCenter, Vector3(0, -1, 0), Vector3(0.5, 0.5, 0));
+    cylinder.addVertex(topCenter, Vector3(0, 1, 0), Vector3(0.5, 0.5, 0));
+
+    for (int sl = 0; sl <= slices; sl++) {
+        float alpha = sl * sliceAngle;
+        Vector3 posB = Vector3::fromSpherical(alpha, 0, bRadius);
+        posB.applyVector(Vector3(0, -height / 2, 0));
+        Vector3 norB = Vector3(0, -1, 0);
+        Vector3 posT = Vector3::fromSpherical(alpha, 0, tRadius);
+        posT.applyVector(Vector3(0, height / 2, 0));
+        Vector3 norT = Vector3(0, 1, 0);
+        Vector3 tex = Vector3::fromSpherical(0, sl * 2*M_PI / slices, 0.5);
+        tex.applyVector(Vector3(0.5, 0.5, 0));
+
+        cylinder.addVertex(posB, norB, tex);
+        cylinder.addVertex(posT, norT, tex);
+    }
 
     //Body
     for (int st = 0; st <= stacks; st++) {
         float bodyRadius = bRadius -  st * ((bRadius - tRadius) / stacks);
         float bodyHeight = -height / 2 + st * (height / stacks);
-        for(int sl = 0; sl < slices; sl++) {
+        for(int sl = 0; sl <= slices; sl++) {
             float alpha = sl * sliceAngle;
-            Vector3 bodyV = Vector3::fromSpherical(alpha, 0, bodyRadius);
-            bodyV.applyVector(Vector3(0, bodyHeight, 0));
-            cylinder.addVertex(bodyV);
+            Vector3 pos = Vector3::fromSpherical(alpha, 0, bodyRadius);
+            pos.applyVector(Vector3(0, bodyHeight, 0));
+            float normalAngle = atan((bRadius - tRadius) / height);
+            Vector3 nor = Vector3::fromSpherical(alpha, normalAngle, 1);
+            Vector3 tex = Vector3(1.0f / slices * sl, 1.0f - 1.0f / stacks *st, 0);
+            cylinder.addVertex(pos, nor, tex);
         }
     }
 
     //Faces
     for (int sl = 0; sl < slices; sl++) {
-        if (sl < slices - 1) {
-            //Bottom
-            cylinder.addFace(0, sl + 3, sl + 2);
-            //Top
-            cylinder.addFace(1, slices * (stacks) + 2 + sl, slices * (stacks) + 3 + sl);
-        }
-        else {
-            //Bottom
-            cylinder.addFace(0, 2, sl + 2);
-            //Top
-            cylinder.addFace(1, slices * (stacks) + 2 + sl, slices * (stacks) + 2);
-        }
+        //Bottom
+        cylinder.addFace(0, sl*2 + 4, sl*2 + 2);
+        //Top
+        cylinder.addFace(1, sl*2 + 3, sl*2 + 5);
         for (int st = 0; st < stacks; st++) {
-            int v0 = st * slices + 2 + sl;
-            int v1;
-            if (sl < slices - 1) {
-                v1 = v0 + 1;  
-            }
-            else {
-                v1 = st * slices + 2;
-            }
-            int v2 = v0 + slices;
-            int v3 = v1 + slices;
-            cylinder.addFace(v0, v1, v2);
-            cylinder.addFace(v1, v3, v2);
+            int v1 = (slices + 2) * 2 + st * (slices + 1) + sl;
+            int v2 = v1 + 1;
+            int v3 = v1 + slices + 1;
+            int v4 = v3 + 1;
+            cylinder.addFace(v1, v2, v3);
+            cylinder.addFace(v2, v4, v3);
         }
-    }*/
+    }
 
     return cylinder;
 }
@@ -696,11 +686,11 @@ Model Model::generateBezierPatch(PatchData patchData, int tessellation) {
                 }
                 //Normal vector
                 float normal[3];
-                crossVectors(derivu, derivv, normal);
+                crossVectors(derivv, derivu, normal);
                 normalizeVector(normal);
                 Vector3 normalVector = Vector3(normal[0], normal[1], normal[2]);
-                int tx = 1.0f / tessellation * u;
-                int ty = 1.0f / tessellation * v;
+                float tx = 1.0f / tessellation * udiv;
+                float ty = 1.0f / tessellation * vdiv;
                 Vector3 texVector = Vector3(tx, ty, 0);
 
                 patch.addVertex(Vector3(point[0], point[1], point[2]), normalVector, texVector);
@@ -825,6 +815,12 @@ float* ColorData::getAmbient() {
     param[2] = ambient.z / 255.0f;
     param[3] = 1.0f;
 
+    return param;
+}
+
+float* ColorData::getShininess() {
+    float* param = (float*)malloc(sizeof(float));
+    *param = shininess;
     return param;
 }
 
