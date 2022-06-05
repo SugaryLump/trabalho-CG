@@ -6,6 +6,8 @@
 #include <GL/glut.h>
 #endif
 
+float defaultDiffuse[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+float defaultSpecular[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 
 PointLight::PointLight(Vector3 position) {
     this->position = position;
@@ -25,7 +27,13 @@ AmbientLight::AmbientLight(Vector3 intensity) {
     this->intensity = intensity;
 }
 
+void defaultParameters(int index) {
+    glLightfv(0x4000 + 0x0001 * index, GL_DIFFUSE, defaultDiffuse);
+    glLightfv(0x4000 + 0x0001 * index, GL_SPECULAR, defaultSpecular);
+}
+
 void PointLight::setupLight(int index) {
+    defaultParameters(index);
     float param[4];
     param[0] = position.x;
     param[1] = position.y;
@@ -35,6 +43,7 @@ void PointLight::setupLight(int index) {
 }
 
 void DirectionalLight::setupLight(int index) {
+    defaultParameters(index);
     float param[4];
     param[0] = direction.x;
     param[1] = direction.y;
@@ -44,6 +53,7 @@ void DirectionalLight::setupLight(int index) {
 }
 
 void Spotlight::setupLight(int index) {
+    defaultParameters(index);
     float pos[4];
     pos[0] = position.x;
     pos[1] = position.y;
